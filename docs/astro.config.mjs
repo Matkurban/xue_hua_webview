@@ -7,7 +7,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Xue Hua WebView',
-      description:
+      description: 'A WebView component for all Flutter platforms.',
       locales: {
         root: {
           label: 'English',
