@@ -1,0 +1,13 @@
+---
+description: 双语文档、SYNC 覆盖路径、只改 latest、保留 #docregion
+globs: "docs/**,**/README*,**/CHANGELOG*,SYNC.md"
+alwaysApply: false
+---
+
+# 文档与同步
+
+- README / CHANGELOG 只在 `xue_hua_webview/` 维护，再按 `SYNC.md` 覆盖：README → 仓库根目录；CHANGELOG → 各子插件。
+- 文档站 `docs/` 必须中英同步。英文与简体中文页面成对维护。
+- 侧栏在 `docs/astro.config.mjs`。新页放 `docs/src/content/docs/` 与 `docs/src/content/docs/zh/`。
+- 改 `examples/platform` 或带标记的示例时，保持 `// #docregion` / `// #enddocregion` 成对完整。
+- 规范正文在 `docs/src/content/docs/release/contributing.md`；根目录 `CONTRIBUTING.md` 只是短入口，不要把长规范再写一遍。

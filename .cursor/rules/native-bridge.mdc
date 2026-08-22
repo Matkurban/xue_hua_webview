@@ -1,0 +1,18 @@
+---
+description: 各平台 Native 桥接选型、Pigeon/ETS 命名，禁止手改生成码
+globs: "**/pigeons/**,**/android/**,**/darwin/**,**/ios/**,**/macos/**,**/windows/**,**/linux/**"
+alwaysApply: false
+---
+
+# Native 桥
+
+| 平台 | 桥 | Native |
+| --- | --- | --- |
+| Android / iOS·macOS / Windows | Pigeon | Java `*ProxyApi` / Darwin Swift / C++ WebView2 |
+| Linux | MethodChannel | C++ WebKitGTK |
+| Web | `dart:js_interop` | 无 native |
+
+- 不要为插件引入 `dart:ffi`。
+- 不要手改 `*.g.dart`、`*.g.kt`、`windows_webview_api.g.{h,cpp}`；改 Pigeon 定义后重新生成。
+- Android 包名：`com.kurban.xue_hua_webview_android`。
+- iOS/macOS 源码放 `xue_hua_webview_wkwebview/darwin/`（`sharedDarwinSource`）。

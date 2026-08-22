@@ -1,0 +1,27 @@
+---
+description: Dart 命名、import、Widget 类、错误与日志约定
+globs: "**/*.dart"
+alwaysApply: false
+---
+
+# Dart 风格
+
+- 文件 `snake_case.dart`；类型 `{Platform}WebViewController` / `{Platform}*CreationParams`。
+- 单引号；`lib/<包名>.dart` + `lib/src/`。
+- import：`dart:*` → `package:flutter/*` → 其他包 → 相对 `src/`。Pigeon 生成码加前缀（`as android_webview`）。
+- 公共 API 写 `///` dartdoc；保留现有 Flutter Authors 版权头。
+- 新 UI 必须用 Widget 类（可 `_PrivateWidget`），禁止方法返回组件。不要批量改 `examples/platform` 里上游遗留的 `favoriteButton()`。
+
+```dart
+// BAD
+Widget _buildBar() => AppBar(title: const Text('WebView'));
+
+// GOOD
+class _WebViewAppBar extends StatelessWidget {
+  const _WebViewAppBar();
+  @override
+  Widget build(BuildContext context) => const AppBar(title: Text('WebView'));
+}
+```
+
+错误：参数 `ArgumentError`；接口未覆盖 `UnimplementedError`；引擎不支持 `UnsupportedError`。日志：`debugPrint('xue_hua_webview_{platform}: ...')`，不用 `print`。

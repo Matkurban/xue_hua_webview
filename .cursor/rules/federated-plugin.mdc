@@ -1,0 +1,28 @@
+---
+description: xue_hua_webview federated 插件分层、新增 API 顺序，禁止当业务 App 写
+alwaysApply: true
+---
+
+# Federated 插件
+
+本仓库是插件 monorepo，不是业务 App。不要引入 Riverpod / Bloc / Provider / signals，也不要新建 melos 或 pub workspace。
+
+分层：应用 → `xue_hua_webview` → `xue_hua_webview_platform_interface` → `xue_hua_webview_{android,wkwebview,web,windows,linux}`。
+
+- 公共 API 加在 `xue_hua_webview` 与 interface。
+- 平台专属用 `AndroidWebViewController`、`WebKitWebViewControllerCreationParams` 等。
+- 平台实现必须 `extends` 接口类，禁止 `implements`。
+- 平台包使用 `PlatformWebViewController.implementation`。
+- 新增或重命名包时同步 `.github/workflows/ci.yml` 的 `packages` 与 `write_overrides()`。
+
+```dart
+// BAD
+class AndroidWebViewController implements PlatformWebViewController { ... }
+
+// GOOD
+class AndroidWebViewController extends PlatformWebViewController {
+  AndroidWebViewController(super.params) : super.implementation();
+}
+```
+
+新增 API：interface 默认 `UnimplementedError` → 各平台真实实现 → 做不到用 `UnsupportedError` → 仅能力检查下的注册型 API 才允许 no-op → 更新能力矩阵与文档 → 测试。

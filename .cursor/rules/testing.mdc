@@ -1,0 +1,15 @@
+---
+description: 单元测试 fake/mockito 选择、集成测试位置、analyze --fatal-infos
+globs: "**/test/**,**/integration_test/**"
+alwaysApply: false
+---
+
+# 测试
+
+- 各包单测在 `test/`。用户可见行为放 `examples/platform/integration_test/`。
+- `xue_hua_webview` 用手写 fake，不用 Mockito。
+- `xue_hua_webview_android` / `xue_hua_webview_wkwebview` / `xue_hua_webview_web` / `xue_hua_webview_platform_interface` 用 Mockito + `build_runner`；不要手改 `*.mocks.dart`。
+- Web：`cd xue_hua_webview_web && flutter test --platform chrome`。
+- Android native：`:xue_hua_webview_android:testDebugUnitTest`。Darwin Swift：`xue_hua_webview_wkwebview/darwin/Tests/`。
+- 提交前：`flutter analyze --fatal-infos` 与 `flutter test`（与 CI 一致）。
+- 测试里用方法组装 Widget 可以；生产/示例新 UI 仍须用 Widget 类。

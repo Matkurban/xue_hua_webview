@@ -1,0 +1,292 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    name: Dart (${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Analyze and test Dart packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          write_overrides() {
+            local package="$1"
+            if [[ "$package" == "xue_hua_webview_platform_interface" ]]; then
+              return
+            fi
+            {
+              echo "dependency_overrides:"
+              echo "  xue_hua_webview_platform_interface:"
+              echo "    path: ../xue_hua_webview_platform_interface"
+              if [[ "$package" == "xue_hua_webview" ]]; then
+                for platform in android wkwebview web windows linux; do
+                  echo "  xue_hua_webview_${platform}:"
+                  echo "    path: ../xue_hua_webview_${platform}"
+                done
+              fi
+            } > "$package/pubspec_overrides.yaml"
+          }
+          packages=(
+            xue_hua_webview_platform_interface
+            xue_hua_webview
+            xue_hua_webview_android
+            xue_hua_webview_wkwebview
+            xue_hua_webview_web
+            xue_hua_webview_windows
+            xue_hua_webview_linux
+          )
+          for package in "${packages[@]}"; do
+            echo "::group::$package"
+            write_overrides "$package"
+            (
+              cd "$package"
+              flutter pub get
+              flutter analyze --fatal-infos
+              if [[ "$package" != "xue_hua_webview_web" ]]; then
+                flutter test
+              fi
+            )
+            echo "::endgroup::"
+          done
+          examples=(
+            xue_hua_webview/example
+          )
+          for example in "${examples[@]}"; do
+            echo "::group::$example"
+            (
+              cd "$example"
+              flutter pub get
+              flutter analyze --fatal-infos
+              flutter test
+            )
+            echo "::endgroup::"
+          done
+
+  web:
+    name: Web browser tests (${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Run browser tests
+        working-directory: xue_hua_webview_web
+        run: |
+          printf '%s\n' \
+            'dependency_overrides:' \
+            '  xue_hua_webview_platform_interface:' \
+            '    path: ../xue_hua_webview_platform_interface' \
+            > pubspec_overrides.yaml
+          flutter pub get
+          flutter test --platform chrome
+
+      - name: Build example
+        working-directory: xue_hua_webview/example
+        run: |
+          flutter pub get
+          flutter build web
+
+  android:
+    name: Android native tests and build (${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Resolve example
+        working-directory: xue_hua_webview/example
+        run: flutter pub get
+
+      - name: Build Android example
+        working-directory: xue_hua_webview/example
+        run: flutter build apk --debug
+
+      - name: Run Android plugin unit tests
+        working-directory: xue_hua_webview/example
+        run: android/gradlew -p android :xue_hua_webview_android:testDebugUnitTest
+
+  apple:
+    name: Apple native builds (${{ matrix.flutter }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Resolve example
+        working-directory: xue_hua_webview/example
+        run: flutter pub get
+
+      - name: Build iOS example
+        working-directory: xue_hua_webview/example
+        run: flutter build ios --simulator --debug
+
+      - name: Build macOS example
+        working-directory: xue_hua_webview/example
+        run: flutter build macos --debug
+
+      - name: Run WKWebView native Swift tests
+        if: matrix.flutter == '3.44.x'
+        run: |
+          python3 tool/add_swift_tests_to_xcode_target.py \
+            xue_hua_webview/example/macos/Runner.xcodeproj \
+            RunnerTests \
+            xue_hua_webview_wkwebview/darwin/Tests
+          xcodebuild test \
+            -workspace xue_hua_webview/example/macos/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            -only-testing:RunnerTests \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
+
+      - name: Run macOS integration tests
+        if: matrix.flutter == '3.44.x'
+        working-directory: xue_hua_webview/example
+        run: |
+          flutter pub get
+          flutter test integration_test/webview_flutter_test.dart -d macos
+
+  linux:
+    name: Linux native build and integration (${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libgtk-3-dev libwebkit2gtk-4.1-dev ninja-build xdotool xvfb
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Build Linux example
+        working-directory: xue_hua_webview/example
+        run: |
+          flutter config --enable-linux-desktop
+          flutter pub get
+          flutter build linux --debug
+
+      - name: Run Linux integration tests
+        if: matrix.flutter == '3.44.x'
+        working-directory: xue_hua_webview/example
+        run: |
+          xvfb-run -a env GDK_BACKEND=x11 WEBKIT_DISABLE_COMPOSITING_MODE=1 \
+            flutter test integration_test/webview_flutter_test.dart -d linux
+
+  windows:
+    name: Windows native build and integration (${{ matrix.flutter }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter:
+          - 3.35.7
+          - 3.44.x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - name: Build Windows example
+        working-directory: xue_hua_webview/example
+        run: |
+          flutter config --enable-windows-desktop
+          flutter pub get
+          flutter build windows --debug
+
+      - name: Run Windows integration tests
+        if: matrix.flutter == '3.44.x'
+        working-directory: xue_hua_webview/example
+        run: flutter test integration_test/webview_flutter_test.dart -d windows

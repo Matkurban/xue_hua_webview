@@ -1,0 +1,113 @@
+# macOS / editor
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.history/
+.buildlog/
+migrate_working_dir/
+
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+build/
+coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+lib/generated_plugin_registrant.dart
+
+# Flutter package lock files. Example applications may keep their locks.
+/xue_hua_webview/pubspec.lock
+/xue_hua_webview_platform_interface/pubspec.lock
+/xue_hua_webview_android/pubspec.lock
+/xue_hua_webview_wkwebview/pubspec.lock
+/xue_hua_webview_linux/pubspec.lock
+/xue_hua_webview_web/pubspec.lock
+/xue_hua_webview_windows/pubspec.lock
+
+# Generated Flutter desktop/mobile build artifacts
+**/flutter/ephemeral/
+**/Flutter/ephemeral/
+**/Flutter/Generated.xcconfig
+**/Flutter/flutter_export_environment.sh
+**/Flutter/App.framework
+**/Flutter/Flutter.framework
+**/Flutter/Flutter.podspec
+**/Flutter/app.flx
+**/Flutter/app.zip
+**/Flutter/flutter_assets/
+**/ServiceDefinitions.json
+**/GeneratedPluginRegistrant.*
+
+# Android
+**/.gradle/
+**/.cxx/
+**/captures/
+**/local.properties
+**/key.properties
+**/*.jks
+**/*.keystore
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+
+# Apple platforms
+**/Pods/
+**/Podfile.lock
+**/.symlinks/
+**/DerivedData/
+**/xcuserdata/
+**/*.xcuserstate
+**/*.pbxuser
+**/*.mode1v3
+**/*.mode2v3
+**/*.perspectivev3
+**/*.moved-aside
+
+# Windows / Visual Studio
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+ipch/
+x64/
+x86/
+out/
+packages/
+*.[Cc]ache
+!*.[Cc]ache/
+
+# Linux native builds
+*.o
+*.so
+*.a
+cmake-build-*/
+
+# Dart build outputs
+app.*.symbols
+app.*.map.json
+
+# Python/cache noise occasionally produced by tooling
+*.pyc
+__pycache__/
+
+FORME/

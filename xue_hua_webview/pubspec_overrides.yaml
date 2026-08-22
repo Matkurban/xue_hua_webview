@@ -1,0 +1,13 @@
+dependency_overrides:
+  xue_hua_webview_platform_interface:
+    path: ../xue_hua_webview_platform_interface
+  xue_hua_webview_android:
+    path: ../xue_hua_webview_android
+  xue_hua_webview_wkwebview:
+    path: ../xue_hua_webview_wkwebview
+  xue_hua_webview_web:
+    path: ../xue_hua_webview_web
+  xue_hua_webview_windows:
+    path: ../xue_hua_webview_windows
+  xue_hua_webview_linux:
+    path: ../xue_hua_webview_linux

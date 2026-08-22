@@ -1,0 +1,35 @@
+name: xue_hua_webview_linux
+description: A Flutter plugin that provides a WebView widget on Linux using WebKitGTK.
+repository: https://github.com/Matkurban/xue_hua_webview
+homepage: https://github.com/Matkurban/xue_hua_webview
+issue_tracker: https://github.com/Matkurban/xue_hua_webview/issues
+version: 1.0.0
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+flutter:
+  plugin:
+    implements: xue_hua_webview
+    platforms:
+      linux:
+        pluginClass: XueHuaWebviewLinuxPlugin
+        dartPluginClass: LinuxWebViewPlatform
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path: ^1.9.1
+  xue_hua_webview_platform_interface: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+topics:
+  - webview
+  - webview-flutter
+  - linux
+  - browser
+  - webkitgtk

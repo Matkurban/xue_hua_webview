@@ -1,0 +1,41 @@
+name: example
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  xue_hua_webview:
+    path: ../
+  abutil: ^1.2.2
+  cupertino_icons: ^1.0.8
+
+dependency_overrides:
+  xue_hua_webview_android:
+    path: ../../xue_hua_webview_android
+  xue_hua_webview_wkwebview:
+    path: ../../xue_hua_webview_wkwebview
+  xue_hua_webview_platform_interface:
+    path: ../../xue_hua_webview_platform_interface
+  xue_hua_webview_linux:
+    path: ../../xue_hua_webview_linux
+  xue_hua_webview_windows:
+    path: ../../xue_hua_webview_windows
+  xue_hua_webview_web:
+    path: ../../xue_hua_webview_web
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
+  xue_hua_webview_platform_interface: ^1.0.0
+
+flutter:
+  uses-material-design: true

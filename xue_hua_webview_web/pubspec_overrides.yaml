@@ -1,0 +1,3 @@
+dependency_overrides:
+  xue_hua_webview_platform_interface:
+    path: ../xue_hua_webview_platform_interface
