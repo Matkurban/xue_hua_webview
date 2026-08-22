@@ -7,13 +7,13 @@ description: Version alignment, dependency baseline, and maintenance rules.
 
 | Package | Version |
 | --- | --- |
-| `xue_hua_webview` | `1.0.0` |
-| `xue_hua_webview_windows` | `1.0.0` |
-| `xue_hua_webview_linux` | `1.0.0` |
-| `xue_hua_webview_web` | `1.0.0` |
-| `xue_hua_webview_platform_interface` | `1.0.0` |
-| `xue_hua_webview_android` | `1.0.0` |
-| `xue_hua_webview_wkwebview` | `1.0.0` |
+| `xue_hua_webview` | `1.0.1` |
+| `xue_hua_webview_windows` | `1.0.1` |
+| `xue_hua_webview_linux` | `1.0.1` |
+| `xue_hua_webview_web` | `1.0.1` |
+| `xue_hua_webview_platform_interface` | `1.0.1` |
+| `xue_hua_webview_android` | `1.0.1` |
+| `xue_hua_webview_wkwebview` | `1.0.1` |
 | Flutter SDK | `>=3.35.0` |
 | Dart SDK | `^3.9.0` |
 

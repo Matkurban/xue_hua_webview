@@ -1,3 +1,7 @@
+## 1.0.1
+
+* Fix a WKWebView Swift compile error in `callAsyncJavaScript` by using WebKit's single-argument `Result` completion handler.
+
 ## 1.0.0
 
 * Initial release of `xue_hua_webview` (renamed from `webview_all` / `webview_platform_interface` / `webview_all_*`). Update pubspec dependencies and `package:` imports; public widget and controller APIs are unchanged.

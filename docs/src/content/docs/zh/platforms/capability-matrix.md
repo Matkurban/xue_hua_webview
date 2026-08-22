@@ -1,6 +1,6 @@
 ---
 title: 能力矩阵
-description: xue_hua_webview 1.0.0 的跨平台能力覆盖。
+description: xue_hua_webview 1.0.1 的跨平台能力覆盖。
 ---
 
 标记说明：

@@ -353,26 +353,20 @@ class WebViewProxyAPIDelegate: PigeonApiDelegateWKWebView, PigeonApiDelegateUIVi
     if #available(iOS 14.0, macOS 11.0, *) {
       pigeonInstance.callAsyncJavaScript(
         functionBody, arguments: arguments, in: nil, in: WKContentWorld.page
-      ) { result, error in
-        if error == nil {
-          if let optionalResult = result as Any?? {
-            switch optionalResult {
-            case .none:
-              completion(.success(nil))
-            case .some(let value):
-              if value is String || value is NSNumber || value is NSDictionary
-                || value is NSArray || value is NSNull
-              {
-                completion(.success(value))
-              } else {
-                completion(.success((value as AnyObject).description))
-              }
-            }
+      ) { result in
+        switch result {
+        case .success(let value):
+          if value is String || value is NSNumber || value is NSDictionary
+            || value is NSArray || value is NSNull
+          {
+            completion(.success(value))
+          } else {
+            completion(.success((value as AnyObject).description))
           }
-        } else {
+        case .failure(let error):
           let pigeonError = PigeonError(
             code: "FWFEvaluateJavaScriptError", message: "Failed evaluating JavaScript.",
-            details: error! as NSError)
+            details: error as NSError)
           completion(.failure(pigeonError))
         }
       }

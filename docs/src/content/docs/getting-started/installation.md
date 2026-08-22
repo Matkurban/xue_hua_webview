@@ -65,7 +65,7 @@ import 'package:xue_hua_webview_wkwebview/xue_hua_webview_wkwebview.dart';
 
 ## Version Contract
 
-The `1.0.0` release is aligned across `xue_hua_webview_platform_interface` and all
+The `1.0.1` release is aligned across `xue_hua_webview_platform_interface` and all
 `xue_hua_webview_*` packages. The wrapper depends on
 `xue_hua_webview_platform_interface ^1.0.0`, `xue_hua_webview_android ^1.0.0`, and
 `xue_hua_webview_wkwebview ^1.0.0`.

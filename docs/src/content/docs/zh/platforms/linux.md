@@ -3,7 +3,7 @@ title: Linux
 description: WebKitGTK 实现、自动 GtkOverlay 集成、API 和限制。
 ---
 
-Linux 由 `xue_hua_webview_linux 1.0.0` 提供，底层使用 WebKitGTK。
+Linux 由 `xue_hua_webview_linux 1.0.1` 提供，底层使用 WebKitGTK。
 
 | 项 | 值 |
 | --- | --- |

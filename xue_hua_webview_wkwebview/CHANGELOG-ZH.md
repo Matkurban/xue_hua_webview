@@ -1,3 +1,7 @@
+## 1.0.1
+
+* 修复 WKWebView `callAsyncJavaScript` 的 Swift 编译错误：完成回调改为匹配 WebKit 的单参数 `Result` 签名。
+
 ## 1.0.0
 
 * 首次发布 `xue_hua_webview`（由 `webview_all` / `webview_platform_interface` / `webview_all_*` 重命名而来）。请更新 pubspec 依赖和 `package:` import；公开的 Widget 与 Controller API 保持不变。

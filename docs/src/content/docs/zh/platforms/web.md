@@ -3,7 +3,7 @@ title: Web
 description: 浏览器 iframe 实现、iframe 属性、fetch 请求和安全限制。
 ---
 
-Web 由 `xue_hua_webview_web 1.0.0` 提供，底层是 HTML `iframe`。
+Web 由 `xue_hua_webview_web 1.0.1` 提供，底层是 HTML `iframe`。
 
 | 项 | 值 |
 | --- | --- |

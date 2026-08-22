@@ -1,6 +1,6 @@
 ---
 title: Capability Matrix
-description: Cross-platform feature support for xue_hua_webview 1.0.0.
+description: Cross-platform feature support for xue_hua_webview 1.0.1.
 ---
 
 Legend:

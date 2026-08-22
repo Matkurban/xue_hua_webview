@@ -1,5 +1,5 @@
 name: xue_hua_webview
-version: 1.0.0
+version: 1.0.1
 description: A WebView plugin supporting Android, iOS, macOS, Windows, Linux, and Web, with an API compatible with webview_flutter.
 repository: https://github.com/Matkurban/xue_hua_webview
 homepage: https://github.com/Matkurban/xue_hua_webview

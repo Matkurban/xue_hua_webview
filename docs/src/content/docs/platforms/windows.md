@@ -3,7 +3,7 @@ title: Windows
 description: WebView2 implementation, runtime setup, APIs, and limits.
 ---
 
-Windows is provided by `xue_hua_webview_windows 1.0.0` and uses Microsoft Edge WebView2.
+Windows is provided by `xue_hua_webview_windows 1.0.1` and uses Microsoft Edge WebView2.
 
 ## Engine
 

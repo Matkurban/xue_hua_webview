@@ -3,7 +3,7 @@ description: A Flutter plugin that provides a WebView widget on web.
 repository: https://github.com/Matkurban/xue_hua_webview
 homepage: https://github.com/Matkurban/xue_hua_webview
 issue_tracker: https://github.com/Matkurban/xue_hua_webview/issues
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: ^3.12.0

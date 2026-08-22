@@ -298,49 +298,49 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_android:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_android"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_linux:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_linux"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_platform_interface:
     dependency: "direct dev"
     description:
       path: "../../xue_hua_webview_platform_interface"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_web:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_web"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_windows:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_windows"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   xue_hua_webview_wkwebview:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_wkwebview"
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
 sdks:
   dart: ">=3.12.0 <4.0.0"
   flutter: ">=3.44.0"
