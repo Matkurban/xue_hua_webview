@@ -80,6 +80,11 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
 )
 
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
+# MSVC 14.51+ treats <experimental/coroutine> as a hard error (STL1011).
+# C++/WinRT still includes that header under C++17; this plugin does not use /await.
+target_compile_definitions(${PLUGIN_NAME} PRIVATE
+  _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
+)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )

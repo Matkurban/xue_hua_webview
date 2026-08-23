@@ -1,3 +1,7 @@
+## 1.0.2
+
+* Fix a Windows MSVC 14.51 (VS 18) build failure (STL1011) by silencing C++/WinRT's deprecated `<experimental/coroutine>` include.
+
 ## 1.0.1
 
 * Fix a WKWebView Swift compile error in `callAsyncJavaScript` by using WebKit's single-argument `Result` completion handler.

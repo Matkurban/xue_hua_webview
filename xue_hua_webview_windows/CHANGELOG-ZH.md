@@ -1,3 +1,7 @@
+## 1.0.2
+
+* 修复 Windows 在 MSVC 14.51（VS 18）下因 C++/WinRT 引入已弃用的 `<experimental/coroutine>` 而编译失败（STL1011）。
+
 ## 1.0.1
 
 * 修复 WKWebView `callAsyncJavaScript` 的 Swift 编译错误：完成回调改为匹配 WebKit 的单参数 `Result` 签名。
