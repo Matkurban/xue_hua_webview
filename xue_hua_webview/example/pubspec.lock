@@ -333,7 +333,7 @@ packages:
       path: "../../xue_hua_webview_windows"
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.0.2"
   xue_hua_webview_wkwebview:
     dependency: "direct overridden"
     description:
