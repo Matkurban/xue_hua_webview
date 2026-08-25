@@ -125,10 +125,12 @@ the main `xue_hua_webview` controller.
 ## Engine Shutdown
 
 The child plugin performs idempotent teardown when the iOS application
-terminates, a supported scene disconnects, or the Flutter engine detaches:
-calls to Dart are disabled and Pigeon handlers and instances are cleared.
-Repeated lifecycle callbacks are harmless. macOS continues to use Flutter's
-engine-detach callback.
+terminates or the Flutter engine detaches: calls to Dart are disabled and
+Pigeon handlers and instances are cleared. Repeated lifecycle callbacks are
+harmless. A scene disconnect does not tear down a still-running engine,
+because `FlutterSceneDelegate` can report disconnect while the binary
+messenger is still alive. macOS continues to use Flutter's engine-detach
+callback.
 
 Scene lifecycle registration is enabled automatically when the Flutter engine
 exposes the public scene protocol. The iOS native `WKWebView` accessor also

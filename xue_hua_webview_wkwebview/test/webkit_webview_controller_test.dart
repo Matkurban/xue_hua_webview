@@ -541,7 +541,7 @@ void main() {
         final request =
             verify(mockWebView.load(captureAny)).captured.single as URLRequest;
         verify(request.setAllHttpHeaderFields(<String, String>{}));
-        verify(request.setHttpMethod('get'));
+        verify(request.setHttpMethod('GET'));
       });
 
       test('GET with headers', () async {
@@ -561,7 +561,7 @@ void main() {
         final request =
             verify(mockWebView.load(captureAny)).captured.single as URLRequest;
         verify(request.setAllHttpHeaderFields(<String, String>{'a': 'header'}));
-        verify(request.setHttpMethod('get'));
+        verify(request.setHttpMethod('GET'));
       });
 
       test('POST without body', () async {
@@ -580,7 +580,7 @@ void main() {
 
         final request =
             verify(mockWebView.load(captureAny)).captured.single as URLRequest;
-        verify(request.setHttpMethod('post'));
+        verify(request.setHttpMethod('POST'));
       });
 
       test('POST with body', () async {
@@ -600,7 +600,7 @@ void main() {
 
         final request =
             verify(mockWebView.load(captureAny)).captured.single as URLRequest;
-        verify(request.setHttpMethod('post'));
+        verify(request.setHttpMethod('POST'));
         verify(request.setHttpBody(Uint8List.fromList('Test Body'.codeUnits)));
       });
     });
@@ -2374,11 +2374,16 @@ window.addEventListener("error", function(e) {
       );
 
       await controller.addUserScript(
-        const UserScript(source: 'window.ready = true;', forMainFrameOnly: false),
+        const UserScript(
+          source: 'window.ready = true;',
+          forMainFrameOnly: false,
+        ),
       );
 
       final WKUserScript captured =
-          verify(mockUserContentController.addUserScript(captureAny)).captured.last
+          verify(
+                mockUserContentController.addUserScript(captureAny),
+              ).captured.last
               as WKUserScript;
       expect(captured.source, 'window.ready = true;');
       expect(captured.injectionTime, UserScriptInjectionTime.atDocumentStart);
@@ -2391,7 +2396,10 @@ window.addEventListener("error", function(e) {
         mockWebView.callAsyncJavaScript('return 1;', <String, Object>{}),
       ).thenAnswer((_) async => 1);
       when(
-        mockWebView.callAsyncJavaScript('throw new Error("nope");', <String, Object>{}),
+        mockWebView.callAsyncJavaScript(
+          'throw new Error("nope");',
+          <String, Object>{},
+        ),
       ).thenThrow(
         PlatformException(code: 'FWFEvaluateJavaScriptError', message: 'nope'),
       );
@@ -2466,6 +2474,7 @@ window.addEventListener("error", function(e) {
 }
 
 // Records the last created instance of itself.
+// ignore: must_be_immutable
 class CapturingNavigationDelegate extends WKNavigationDelegate {
   CapturingNavigationDelegate({
     super.didFinishNavigation,
@@ -2489,12 +2498,24 @@ class CapturingNavigationDelegate extends WKNavigationDelegate {
           return NavigationResponsePolicy.cancel;
         },
         didReceiveAuthenticationChallenge: (_, __, ___) async {
-          return AuthenticationChallengeResponse.pigeon_detached(
-            disposition:
-                UrlSessionAuthChallengeDisposition.performDefaultHandling,
-          );
+          return <Object?>[
+            UrlSessionAuthChallengeDisposition.performDefaultHandling,
+            null,
+          ];
         },
       );
+
+  bool handlesHttpAuthRequest = false;
+  bool handlesSslAuthError = false;
+
+  @override
+  Future<void> setChallengeHandling(
+    bool handlesHttpAuthRequest,
+    bool handlesSslAuthError,
+  ) async {
+    this.handlesHttpAuthRequest = handlesHttpAuthRequest;
+    this.handlesSslAuthError = handlesSslAuthError;
+  }
 }
 
 // Records the last created instance of itself.

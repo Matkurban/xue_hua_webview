@@ -93,10 +93,11 @@ macOS 与 iOS 共用 Dart 包。macOS 端只使用公开原生 WebKit API，并�
 
 ## Engine 关闭
 
-子插件会在 iOS application termination、受支持的 scene disconnect 或 Flutter
-engine detach 时进行幂等清理：停止向 Dart 发消息，并移除 Pigeon handler 和
-instance；生命周期回调重复到达也不会出错。macOS 继续使用 Flutter 的 engine
-detach 回调。
+子插件会在 iOS application termination 或 Flutter engine detach 时进行幂等清理：
+停止向 Dart 发消息，并移除 Pigeon handler 和 instance；生命周期回调重复到达也
+不会出错。scene disconnect 不会拆除仍在运行的 engine，因为 `FlutterSceneDelegate`
+可能在 binary messenger 仍存活时转发 disconnect。macOS 继续使用 Flutter 的
+engine detach 回调。
 
 当 Flutter engine 提供公开 scene 协议时，插件会自动注册 scene 生命周期。
 iOS 原生 `WKWebView` 访问入口也支持传入 `FlutterPluginRegistrar`：可用时使用

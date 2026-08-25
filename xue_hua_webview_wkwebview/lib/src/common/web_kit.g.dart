@@ -135,7 +135,7 @@ class PigeonOverrides {
       WKWebView webView,
       WKNavigationResponse navigationResponse,
     ) decidePolicyForNavigationResponse,
-    required Future<AuthenticationChallengeResponse> Function(
+    required Future<List<Object?>> Function(
       WKNavigationDelegate pigeon_instance,
       WKWebView webView,
       URLAuthenticationChallenge challenge,
@@ -4176,7 +4176,7 @@ class WKNavigationDelegate extends NSObject {
       WKNavigationDelegate pigeon_instance,
       WKWebView webView,
     )? webViewWebContentProcessDidTerminate,
-    required Future<AuthenticationChallengeResponse> Function(
+    required Future<List<Object?>> Function(
       WKNavigationDelegate pigeon_instance,
       WKWebView webView,
       URLAuthenticationChallenge challenge,
@@ -4453,6 +4453,11 @@ class WKNavigationDelegate extends NSObject {
 
   /// Asks the delegate to respond to an authentication challenge.
   ///
+  /// Returns `[UrlSessionAuthChallengeDisposition, URLCredential?]`. A value
+  /// list is used instead of [AuthenticationChallengeResponse] so the native
+  /// decoder does not depend on the Pigeon instance manager. See
+  /// https://github.com/flutter/flutter/issues/162437.
+  ///
   /// For the associated Native object to be automatically garbage collected,
   /// it is required that the implementation of this `Function` doesn't have a
   /// strong reference to the encapsulating class instance. When this `Function`
@@ -4470,7 +4475,7 @@ class WKNavigationDelegate extends NSObject {
   ///
   /// Alternatively, [PigeonInstanceManager.removeWeakReference] can be used to
   /// release the associated Native object manually.
-  final Future<AuthenticationChallengeResponse> Function(
+  final Future<List<Object?>> Function(
     WKNavigationDelegate pigeon_instance,
     WKWebView webView,
     URLAuthenticationChallenge challenge,
@@ -4514,7 +4519,7 @@ class WKNavigationDelegate extends NSObject {
       WKNavigationDelegate pigeon_instance,
       WKWebView webView,
     )? webViewWebContentProcessDidTerminate,
-    Future<AuthenticationChallengeResponse> Function(
+    Future<List<Object?>> Function(
       WKNavigationDelegate pigeon_instance,
       WKWebView webView,
       URLAuthenticationChallenge challenge,
@@ -4746,7 +4751,7 @@ class WKNavigationDelegate extends NSObject {
           final URLAuthenticationChallenge arg_challenge =
               args[2]! as URLAuthenticationChallenge;
           try {
-            final AuthenticationChallengeResponse output =
+            final List<Object?> output =
                 await (didReceiveAuthenticationChallenge ??
                         arg_pigeon_instance.didReceiveAuthenticationChallenge)
                     .call(arg_pigeon_instance, arg_webView, arg_challenge);
@@ -4760,6 +4765,36 @@ class WKNavigationDelegate extends NSObject {
         });
       }
     }
+  }
+
+  /// Whether native should forward HTTP and SSL authentication challenges to Dart.
+  ///
+  /// When both flags are false, native uses `performDefaultHandling` without a
+  /// Dart round trip. That keeps ordinary HTTPS loads working if the Pigeon
+  /// auth-challenge reply cannot be decoded.
+  Future<void> setChallengeHandling(
+    bool handlesHttpAuthRequest,
+    bool handlesSslAuthError,
+  ) async {
+    final _PigeonInternalProxyApiBaseCodec pigeonChannelCodec =
+        _pigeonVar_codecWKNavigationDelegate;
+    final BinaryMessenger? pigeonVar_binaryMessenger = pigeon_binaryMessenger;
+    const pigeonVar_channelName =
+        'dev.flutter.pigeon.xue_hua_webview_wkwebview.WKNavigationDelegate.setChallengeHandling';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel
+        .send(<Object?>[this, handlesHttpAuthRequest, handlesSslAuthError]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   @override

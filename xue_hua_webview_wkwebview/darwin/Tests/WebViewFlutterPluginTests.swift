@@ -42,5 +42,14 @@ class WebViewFlutterPluginTests: XCTestCase {
         UIApplication.shared)
       XCTAssertNil(plugin.proxyApiRegistrar)
     }
+
+    func testSceneDidDisconnectDoesNotTearDownRunningEngine() {
+      let plugin = WebViewFlutterPlugin(binaryMessenger: TestBinaryMessenger())
+      XCTAssertNotNil(plugin.proxyApiRegistrar)
+
+      plugin.perform(NSSelectorFromString("sceneDidDisconnect:"), with: nil)
+
+      XCTAssertNotNil(plugin.proxyApiRegistrar)
+    }
   #endif
 }

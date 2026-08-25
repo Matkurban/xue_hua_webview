@@ -775,6 +775,16 @@ abstract class WKScriptMessageHandler extends NSObject {
 abstract class WKNavigationDelegate extends NSObject {
   WKNavigationDelegate();
 
+  /// Whether native should forward HTTP and SSL authentication challenges to Dart.
+  ///
+  /// When both flags are false, native uses `performDefaultHandling` without a
+  /// Dart round trip. That keeps ordinary HTTPS loads working if the Pigeon
+  /// auth-challenge reply cannot be decoded.
+  void setChallengeHandling(
+    bool handlesHttpAuthRequest,
+    bool handlesSslAuthError,
+  );
+
   /// Tells the delegate that navigation is complete.
   late void Function(WKWebView webView, String? url)? didFinishNavigation;
 
@@ -811,8 +821,13 @@ abstract class WKNavigationDelegate extends NSObject {
   void Function(WKWebView webView)? webViewWebContentProcessDidTerminate;
 
   /// Asks the delegate to respond to an authentication challenge.
+  ///
+  /// Returns `[UrlSessionAuthChallengeDisposition, URLCredential?]`. A value
+  /// list is used instead of [AuthenticationChallengeResponse] so the native
+  /// decoder does not depend on the Pigeon instance manager. See
+  /// https://github.com/flutter/flutter/issues/162437.
   @async
-  late AuthenticationChallengeResponse Function(
+  late List<Object?> Function(
     WKWebView webView,
     URLAuthenticationChallenge challenge,
   )

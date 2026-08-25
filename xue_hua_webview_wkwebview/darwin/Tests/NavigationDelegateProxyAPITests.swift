@@ -113,11 +113,112 @@ class NavigationDelegateProxyAPITests: XCTestCase {
     let api = TestNavigationDelegateApi()
     let registrar = TestProxyApiRegistrar()
     let instance = NavigationDelegateImpl(api: api, registrar: registrar)
+    instance.handlesHttpAuthRequest = true
     let webView = WKWebView(frame: .zero)
-    let challenge = URLAuthenticationChallenge(
-      protectionSpace: URLProtectionSpace(), proposedCredential: nil, previousFailureCount: 3,
-      failureResponse: nil, error: nil, sender: TestURLAuthenticationChallengeSender())
+    let challenge = makeAuthenticationChallenge(
+      authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
 
+    let (dispositionResult, credentialResult) = waitForAuthChallenge(
+      instance: instance, webView: webView, challenge: challenge)
+
+    XCTAssertEqual(api.didReceiveAuthenticationChallengeArgs, [webView, challenge])
+    XCTAssertEqual(dispositionResult, .useCredential)
+    XCTAssertEqual(credentialResult?.user, "user1")
+    XCTAssertEqual(credentialResult?.password, "password1")
+    XCTAssertEqual(credentialResult?.persistence, URLCredential.Persistence.none)
+  }
+
+  @MainActor func testServerTrustWithoutSslCallbackUsesDefaultHandling() {
+    let api = TestNavigationDelegateApi()
+    let registrar = TestProxyApiRegistrar()
+    let instance = NavigationDelegateImpl(api: api, registrar: registrar)
+    let webView = WKWebView(frame: .zero)
+    let challenge = makeAuthenticationChallenge(
+      authenticationMethod: NSURLAuthenticationMethodServerTrust)
+
+    let (dispositionResult, credentialResult) = waitForAuthChallenge(
+      instance: instance, webView: webView, challenge: challenge)
+
+    XCTAssertNil(api.didReceiveAuthenticationChallengeArgs)
+    XCTAssertEqual(dispositionResult, .performDefaultHandling)
+    XCTAssertNil(credentialResult)
+  }
+
+  @MainActor func testAuthenticationChallengeDartFailureUsesDefaultHandling() {
+    let api = FailingNavigationDelegateApi()
+    let registrar = TestProxyApiRegistrar()
+    let instance = NavigationDelegateImpl(api: api, registrar: registrar)
+    instance.handlesHttpAuthRequest = true
+    let webView = WKWebView(frame: .zero)
+    let challenge = makeAuthenticationChallenge(
+      authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
+
+    let (dispositionResult, credentialResult) = waitForAuthChallenge(
+      instance: instance, webView: webView, challenge: challenge)
+
+    XCTAssertEqual(api.didReceiveAuthenticationChallengeArgs, [webView, challenge])
+    XCTAssertEqual(dispositionResult, .performDefaultHandling)
+    XCTAssertNil(credentialResult)
+  }
+
+  @MainActor func testDecidePolicyForNavigationActionDartFailureAllows() {
+    let api = FailingNavigationDelegateApi()
+    let registrar = TestProxyApiRegistrar()
+    let instance = NavigationDelegateImpl(api: api, registrar: registrar)
+    let webView = WKWebView(frame: .zero)
+    let navigationAction = TestNavigationAction()
+
+    var result: WKNavigationActionPolicy?
+    let callbackExpectation = expectation(description: "Wait for callback.")
+    instance.webView(webView, decidePolicyFor: navigationAction) { policy in
+      result = policy
+      callbackExpectation.fulfill()
+    }
+
+    wait(for: [callbackExpectation], timeout: 1.0)
+
+    XCTAssertEqual(api.decidePolicyForNavigationActionArgs, [webView, navigationAction])
+    XCTAssertEqual(result, .allow)
+  }
+
+  @MainActor func testDecidePolicyForNavigationResponseDartFailureAllows() {
+    let api = FailingNavigationDelegateApi()
+    let registrar = TestProxyApiRegistrar()
+    let instance = NavigationDelegateImpl(api: api, registrar: registrar)
+    let webView = WKWebView(frame: .zero)
+    let navigationResponse = TestNavigationResponse.instance
+
+    var result: WKNavigationResponsePolicy?
+    let callbackExpectation = expectation(description: "Wait for callback.")
+    instance.webView(webView, decidePolicyFor: navigationResponse) { policy in
+      result = policy
+      callbackExpectation.fulfill()
+    }
+
+    wait(for: [callbackExpectation], timeout: 1.0)
+
+    XCTAssertEqual(api.decidePolicyForNavigationResponseArgs, [webView, navigationResponse])
+    XCTAssertEqual(result, .allow)
+  }
+
+  func testSetChallengeHandling() {
+    let registrar = TestProxyApiRegistrar()
+    let api = registrar.apiDelegate.pigeonApiWKNavigationDelegate(registrar)
+    let instance =
+      try? api.pigeonDelegate.pigeonDefaultConstructor(pigeonApi: api) as? NavigationDelegateImpl
+    XCTAssertNotNil(instance)
+
+    try? api.pigeonDelegate.setChallengeHandling(
+      pigeonApi: api, pigeonInstance: instance!, handlesHttpAuthRequest: true,
+      handlesSslAuthError: true)
+
+    XCTAssertEqual(instance?.handlesHttpAuthRequest, true)
+    XCTAssertEqual(instance?.handlesSslAuthError, true)
+  }
+
+  @MainActor private func waitForAuthChallenge(
+    instance: NavigationDelegateImpl, webView: WKWebView, challenge: URLAuthenticationChallenge
+  ) -> (URLSession.AuthChallengeDisposition?, URLCredential?) {
     var dispositionResult: URLSession.AuthChallengeDisposition?
     var credentialResult: URLCredential?
     let callbackExpectation = expectation(description: "Wait for callback.")
@@ -128,12 +229,17 @@ class NavigationDelegateProxyAPITests: XCTestCase {
     }
 
     wait(for: [callbackExpectation], timeout: 1.0)
+    return (dispositionResult, credentialResult)
+  }
 
-    XCTAssertEqual(api.didReceiveAuthenticationChallengeArgs, [webView, challenge])
-    XCTAssertEqual(dispositionResult, .useCredential)
-    XCTAssertEqual(credentialResult?.user, "user1")
-    XCTAssertEqual(credentialResult?.password, "password1")
-    XCTAssertEqual(credentialResult?.persistence, URLCredential.Persistence.none)
+  private func makeAuthenticationChallenge(authenticationMethod: String) -> URLAuthenticationChallenge
+  {
+    let protectionSpace = URLProtectionSpace(
+      host: "example.com", port: 443, protocol: NSURLProtectionSpaceHTTPS, realm: nil,
+      authenticationMethod: authenticationMethod)
+    return URLAuthenticationChallenge(
+      protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0,
+      failureResponse: nil, error: nil, sender: TestURLAuthenticationChallengeSender())
   }
 }
 
@@ -221,20 +327,56 @@ class TestNavigationDelegateApi: PigeonApiProtocolWKNavigationDelegate {
   func didReceiveAuthenticationChallenge(
     pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView,
     challenge challengeArg: URLAuthenticationChallenge,
-    completion:
-      @escaping (
-        Result<
-          xue_hua_webview_wkwebview.AuthenticationChallengeResponse,
-          xue_hua_webview_wkwebview.PigeonError
-        >
-      ) -> Void
+    completion: @escaping (Result<[Any?], xue_hua_webview_wkwebview.PigeonError>) -> Void
   ) {
     didReceiveAuthenticationChallengeArgs = [webViewArg, challengeArg]
     completion(
-      .success(
-        AuthenticationChallengeResponse(
-          disposition: .useCredential,
-          credential: URLCredential(user: "user1", password: "password1", persistence: .none))))
+      .success([
+        UrlSessionAuthChallengeDisposition.useCredential,
+        URLCredential(user: "user1", password: "password1", persistence: .none),
+      ]))
+  }
+}
+
+class FailingNavigationDelegateApi: TestNavigationDelegateApi {
+  override func decidePolicyForNavigationAction(
+    pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView,
+    navigationAction navigationActionArg: WKNavigationAction,
+    completion:
+      @escaping (
+        Result<
+          xue_hua_webview_wkwebview.NavigationActionPolicy, xue_hua_webview_wkwebview.PigeonError
+        >
+      ) -> Void
+  ) {
+    decidePolicyForNavigationActionArgs = [webViewArg, navigationActionArg]
+    completion(
+      .failure(PigeonError(code: "channel-error", message: "failed", details: nil)))
+  }
+
+  override func decidePolicyForNavigationResponse(
+    pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView,
+    navigationResponse navigationResponseArg: WKNavigationResponse,
+    completion:
+      @escaping (
+        Result<
+          xue_hua_webview_wkwebview.NavigationResponsePolicy, xue_hua_webview_wkwebview.PigeonError
+        >
+      ) -> Void
+  ) {
+    decidePolicyForNavigationResponseArgs = [webViewArg, navigationResponseArg]
+    completion(
+      .failure(PigeonError(code: "channel-error", message: "failed", details: nil)))
+  }
+
+  override func didReceiveAuthenticationChallenge(
+    pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView,
+    challenge challengeArg: URLAuthenticationChallenge,
+    completion: @escaping (Result<[Any?], xue_hua_webview_wkwebview.PigeonError>) -> Void
+  ) {
+    didReceiveAuthenticationChallengeArgs = [webViewArg, challengeArg]
+    completion(
+      .failure(PigeonError(code: "channel-error", message: "failed", details: nil)))
   }
 }
 

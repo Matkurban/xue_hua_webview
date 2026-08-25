@@ -68,7 +68,11 @@ public class WebViewFlutterPlugin: NSObject, FlutterPlugin {
 
     @objc(sceneDidDisconnect:)
     public func sceneDidDisconnect(_ scene: UIScene) {
-      tearDownProxyAPIRegistrar()
+      // Engine teardown is handled by `detachFromEngine` and
+      // `applicationWillTerminate`. Tearing down here would set
+      // `ignoreCallsToDart` on a still-running engine if FlutterSceneDelegate
+      // forwards disconnect while the binary messenger is alive, which then
+      // cancels in-flight HTTPS authentication challenges.
     }
 
     private func registerForCompatibilityLookup(binaryMessenger: FlutterBinaryMessenger) {

@@ -3613,6 +3613,12 @@ withIdentifier: pigeonIdentifierArg)
 }
 protocol PigeonApiDelegateWKNavigationDelegate {
   func pigeonDefaultConstructor(pigeonApi: PigeonApiWKNavigationDelegate) throws -> WKNavigationDelegate
+  /// Whether native should forward HTTP and SSL authentication challenges to Dart.
+  ///
+  /// When both flags are false, native uses `performDefaultHandling` without a
+  /// Dart round trip. That keeps ordinary HTTPS loads working if the Pigeon
+  /// auth-challenge reply cannot be decoded.
+  func setChallengeHandling(pigeonApi: PigeonApiWKNavigationDelegate, pigeonInstance: WKNavigationDelegate, handlesHttpAuthRequest: Bool, handlesSslAuthError: Bool) throws
 }
 
 protocol PigeonApiProtocolWKNavigationDelegate {
@@ -3634,7 +3640,12 @@ protocol PigeonApiProtocolWKNavigationDelegate {
   /// Tells the delegate that the web view’s content process was terminated.
   func webViewWebContentProcessDidTerminate(pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView, completion: @escaping (Result<Void, PigeonError>) -> Void)
   /// Asks the delegate to respond to an authentication challenge.
-  func didReceiveAuthenticationChallenge(pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView, challenge challengeArg: URLAuthenticationChallenge, completion: @escaping (Result<AuthenticationChallengeResponse, PigeonError>) -> Void)
+  ///
+  /// Returns `[UrlSessionAuthChallengeDisposition, URLCredential?]`. A value
+  /// list is used instead of [AuthenticationChallengeResponse] so the native
+  /// decoder does not depend on the Pigeon instance manager. See
+  /// https://github.com/flutter/flutter/issues/162437.
+  func didReceiveAuthenticationChallenge(pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView, challenge challengeArg: URLAuthenticationChallenge, completion: @escaping (Result<[Any?], PigeonError>) -> Void)
 }
 
 final class PigeonApiWKNavigationDelegate: PigeonApiProtocolWKNavigationDelegate  {
@@ -3671,6 +3682,23 @@ withIdentifier: pigeonIdentifierArg)
       }
     } else {
       pigeonDefaultConstructorChannel.setMessageHandler(nil)
+    }
+    let setChallengeHandlingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.xue_hua_webview_wkwebview.WKNavigationDelegate.setChallengeHandling", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setChallengeHandlingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let pigeonInstanceArg = args[0] as! WKNavigationDelegate
+        let handlesHttpAuthRequestArg = args[1] as! Bool
+        let handlesSslAuthErrorArg = args[2] as! Bool
+        do {
+          try api.pigeonDelegate.setChallengeHandling(pigeonApi: api, pigeonInstance: pigeonInstanceArg, handlesHttpAuthRequest: handlesHttpAuthRequestArg, handlesSslAuthError: handlesSslAuthErrorArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setChallengeHandlingChannel.setMessageHandler(nil)
     }
   }
 
@@ -3961,7 +3989,12 @@ withIdentifier: pigeonIdentifierArg)
   }
 
   /// Asks the delegate to respond to an authentication challenge.
-  func didReceiveAuthenticationChallenge(pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView, challenge challengeArg: URLAuthenticationChallenge, completion: @escaping (Result<AuthenticationChallengeResponse, PigeonError>) -> Void)   {
+  ///
+  /// Returns `[UrlSessionAuthChallengeDisposition, URLCredential?]`. A value
+  /// list is used instead of [AuthenticationChallengeResponse] so the native
+  /// decoder does not depend on the Pigeon instance manager. See
+  /// https://github.com/flutter/flutter/issues/162437.
+  func didReceiveAuthenticationChallenge(pigeonInstance pigeonInstanceArg: WKNavigationDelegate, webView webViewArg: WKWebView, challenge challengeArg: URLAuthenticationChallenge, completion: @escaping (Result<[Any?], PigeonError>) -> Void)   {
     if pigeonRegistrar.ignoreCallsToDart {
       completion(
         .failure(
@@ -3994,7 +4027,7 @@ withIdentifier: pigeonIdentifierArg)
       } else if listResponse[0] == nil {
         completion(.failure(PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
       } else {
-        let result = listResponse[0] as! AuthenticationChallengeResponse
+        let result = listResponse[0] as! [Any?]
         completion(.success(result))
       }
     }

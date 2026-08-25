@@ -1,3 +1,8 @@
+## 1.0.2
+
+* 修复 iOS 和 macOS 在设置 `NavigationDelegate` 后 HTTPS 无法加载的问题：TLS server-trust 质询在 Dart 往返失败时会被取消。
+* WKWebView `loadRequest` 改用大写 HTTP 方法（`GET` / `POST`）。
+
 ## 1.0.1
 
 * 修复 WKWebView `callAsyncJavaScript` 的 Swift 编译错误：完成回调改为匹配 WebKit 的单参数 `Result` 签名。

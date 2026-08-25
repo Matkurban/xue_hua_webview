@@ -60,10 +60,10 @@ void main() {
             return NavigationResponsePolicy.cancel;
           },
           didReceiveAuthenticationChallenge: (_, __, ___) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
+            return <Object?>[
+              UrlSessionAuthChallengeDisposition.performDefaultHandling,
+              null,
+            ];
           },
         ),
         WKWebView.pigeon_detached(),
@@ -94,10 +94,10 @@ void main() {
             return NavigationResponsePolicy.cancel;
           },
           didReceiveAuthenticationChallenge: (_, __, ___) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
+            return <Object?>[
+              UrlSessionAuthChallengeDisposition.performDefaultHandling,
+              null,
+            ];
           },
         ),
         WKWebView.pigeon_detached(),
@@ -131,10 +131,10 @@ void main() {
                 return NavigationResponsePolicy.cancel;
               },
               didReceiveAuthenticationChallenge: (_, __, ___) async {
-                return AuthenticationChallengeResponse.pigeon_detached(
-                  disposition:
-                      UrlSessionAuthChallengeDisposition.performDefaultHandling,
-                );
+                return <Object?>[
+                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                  null,
+                ];
               },
             ),
             WKWebView.pigeon_detached(),
@@ -171,10 +171,10 @@ void main() {
                 return NavigationResponsePolicy.cancel;
               },
               didReceiveAuthenticationChallenge: (_, __, ___) async {
-                return AuthenticationChallengeResponse.pigeon_detached(
-                  disposition:
-                      UrlSessionAuthChallengeDisposition.performDefaultHandling,
-                );
+                return <Object?>[
+                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                  null,
+                ];
               },
             ),
             WKWebView.pigeon_detached(),
@@ -210,10 +210,10 @@ void main() {
             return NavigationResponsePolicy.cancel;
           },
           didReceiveAuthenticationChallenge: (_, __, ___) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
+            return <Object?>[
+              UrlSessionAuthChallengeDisposition.performDefaultHandling,
+              null,
+            ];
           },
         ),
         WKWebView.pigeon_detached(),
@@ -261,10 +261,10 @@ void main() {
             return NavigationResponsePolicy.cancel;
           },
           didReceiveAuthenticationChallenge: (_, __, ___) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
+            return <Object?>[
+              UrlSessionAuthChallengeDisposition.performDefaultHandling,
+              null,
+            ];
           },
         ),
         WKWebView.pigeon_detached(),
@@ -314,10 +314,10 @@ void main() {
               return NavigationResponsePolicy.cancel;
             },
             didReceiveAuthenticationChallenge: (_, __, ___) async {
-              return AuthenticationChallengeResponse.pigeon_detached(
-                disposition:
-                    UrlSessionAuthChallengeDisposition.performDefaultHandling,
-              );
+              return <Object?>[
+                UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                null,
+              ];
             },
           ),
           WKWebView.pigeon_detached(),
@@ -363,10 +363,10 @@ void main() {
               return NavigationResponsePolicy.cancel;
             },
             didReceiveAuthenticationChallenge: (_, __, ___) async {
-              return AuthenticationChallengeResponse.pigeon_detached(
-                disposition:
-                    UrlSessionAuthChallengeDisposition.performDefaultHandling,
-              );
+              return <Object?>[
+                UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                null,
+              ];
             },
           ),
           WKWebView.pigeon_detached(),
@@ -419,10 +419,10 @@ void main() {
                   return NavigationResponsePolicy.cancel;
                 },
                 didReceiveAuthenticationChallenge: (_, __, ___) async {
-                  return AuthenticationChallengeResponse.pigeon_detached(
-                    disposition: UrlSessionAuthChallengeDisposition
-                        .performDefaultHandling,
-                  );
+                  return <Object?>[
+                    UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                    null,
+                  ];
                 },
               ),
               WKWebView.pigeon_detached(),
@@ -445,16 +445,6 @@ void main() {
     test('onHttpBasicAuthRequest emits host and realm', () async {
       PigeonOverrides.wKNavigationDelegate_new =
           CapturingNavigationDelegate.new;
-      PigeonOverrides.authenticationChallengeResponse_createAsync =
-          (
-            UrlSessionAuthChallengeDisposition disposition,
-            URLCredential? credential,
-          ) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
-          };
       final iosNavigationDelegate = WebKitNavigationDelegate(
         const WebKitNavigationDelegateCreationParams(),
       );
@@ -495,10 +485,10 @@ void main() {
                 return NavigationResponsePolicy.cancel;
               },
               didReceiveAuthenticationChallenge: (_, __, ___) async {
-                return AuthenticationChallengeResponse.pigeon_detached(
-                  disposition:
-                      UrlSessionAuthChallengeDisposition.performDefaultHandling,
-                );
+                return <Object?>[
+                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                  null,
+                ];
               },
             ),
             WKWebView.pigeon_detached(),
@@ -517,16 +507,6 @@ void main() {
 
       PigeonOverrides.wKNavigationDelegate_new =
           CapturingNavigationDelegate.new;
-      PigeonOverrides.authenticationChallengeResponse_createAsync =
-          (
-            UrlSessionAuthChallengeDisposition disposition,
-            URLCredential? credential,
-          ) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition: disposition,
-              credential: credential,
-            );
-          };
       PigeonOverrides.uRLCredential_withUserAsync =
           (
             String user,
@@ -575,31 +555,28 @@ void main() {
         }),
       );
 
-      final AuthenticationChallengeResponse result =
-          await CapturingNavigationDelegate.lastCreatedDelegate
-              .didReceiveAuthenticationChallenge(
-                WKNavigationDelegate.pigeon_detached(
-                  decidePolicyForNavigationAction: (_, __, ___) async {
-                    return NavigationActionPolicy.cancel;
-                  },
-                  decidePolicyForNavigationResponse: (_, __, ___) async {
-                    return NavigationResponsePolicy.cancel;
-                  },
-                  didReceiveAuthenticationChallenge: (_, __, ___) async {
-                    return AuthenticationChallengeResponse.pigeon_detached(
-                      disposition: UrlSessionAuthChallengeDisposition
-                          .performDefaultHandling,
-                    );
-                  },
-                ),
-                WKWebView.pigeon_detached(),
-                mockChallenge,
-              );
+      final List<Object?> result = await CapturingNavigationDelegate
+          .lastCreatedDelegate
+          .didReceiveAuthenticationChallenge(
+            WKNavigationDelegate.pigeon_detached(
+              decidePolicyForNavigationAction: (_, __, ___) async {
+                return NavigationActionPolicy.cancel;
+              },
+              decidePolicyForNavigationResponse: (_, __, ___) async {
+                return NavigationResponsePolicy.cancel;
+              },
+              didReceiveAuthenticationChallenge: (_, __, ___) async {
+                return <Object?>[
+                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
+                  null,
+                ];
+              },
+            ),
+            WKWebView.pigeon_detached(),
+            mockChallenge,
+          );
 
-      expect(
-        result.disposition,
-        UrlSessionAuthChallengeDisposition.useCredential,
-      );
+      expect(result[0], UrlSessionAuthChallengeDisposition.useCredential);
 
       expect(callbackHost, expectedHost);
       expect(callbackRealm, expectedRealm);
@@ -614,16 +591,6 @@ void main() {
 
       PigeonOverrides.wKNavigationDelegate_new =
           CapturingNavigationDelegate.new;
-      PigeonOverrides.authenticationChallengeResponse_createAsync =
-          (
-            UrlSessionAuthChallengeDisposition disposition,
-            URLCredential? credential,
-          ) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition: disposition,
-              credential: credential,
-            );
-          };
       PigeonOverrides.uRLCredential_serverTrustAsync = (_) async {
         return URLCredential.pigeon_detached();
       };
@@ -685,21 +652,21 @@ void main() {
           return NavigationResponsePolicy.cancel;
         },
         didReceiveAuthenticationChallenge: (_, __, ___) async {
-          return AuthenticationChallengeResponse.pigeon_detached(
-            disposition:
-                UrlSessionAuthChallengeDisposition.performDefaultHandling,
-          );
+          return <Object?>[
+            UrlSessionAuthChallengeDisposition.performDefaultHandling,
+            null,
+          ];
         },
       );
       final testWebView = WKWebView.pigeon_detached();
 
-      Future<AuthenticationChallengeResponse> authReplyFuture =
-          CapturingNavigationDelegate.lastCreatedDelegate
-              .didReceiveAuthenticationChallenge(
-                testDelegate,
-                testWebView,
-                mockChallenge,
-              );
+      Future<List<Object?>> authReplyFuture = CapturingNavigationDelegate
+          .lastCreatedDelegate
+          .didReceiveAuthenticationChallenge(
+            testDelegate,
+            testWebView,
+            mockChallenge,
+          );
 
       var error = await errorCompleter.future as WebKitSslAuthError;
       expect(error.certificate?.data, certificateData);
@@ -710,11 +677,8 @@ void main() {
       // Test proceed.
       await error.proceed();
 
-      AuthenticationChallengeResponse authReply = await authReplyFuture;
-      expect(
-        authReply.disposition,
-        UrlSessionAuthChallengeDisposition.useCredential,
-      );
+      List<Object?> authReply = await authReplyFuture;
+      expect(authReply[0], UrlSessionAuthChallengeDisposition.useCredential);
 
       // Test cancel.
       errorCompleter = Completer<PlatformSslAuthError>();
@@ -730,7 +694,7 @@ void main() {
 
       authReply = await authReplyFuture;
       expect(
-        authReply.disposition,
+        authReply[0],
         UrlSessionAuthChallengeDisposition.cancelAuthenticationChallenge,
       );
     });
@@ -740,16 +704,6 @@ void main() {
       () async {
         PigeonOverrides.wKNavigationDelegate_new =
             CapturingNavigationDelegate.new;
-        PigeonOverrides.authenticationChallengeResponse_createAsync =
-            (
-              UrlSessionAuthChallengeDisposition disposition,
-              URLCredential? credential,
-            ) async {
-              return AuthenticationChallengeResponse.pigeon_detached(
-                disposition: disposition,
-                credential: credential,
-              );
-            };
         WebKitNavigationDelegate(
           const WebKitNavigationDelegateCreationParams(),
         );
@@ -771,33 +725,89 @@ void main() {
             return NavigationResponsePolicy.cancel;
           },
           didReceiveAuthenticationChallenge: (_, __, ___) async {
-            return AuthenticationChallengeResponse.pigeon_detached(
-              disposition:
-                  UrlSessionAuthChallengeDisposition.performDefaultHandling,
-            );
+            return <Object?>[
+              UrlSessionAuthChallengeDisposition.performDefaultHandling,
+              null,
+            ];
           },
         );
         final testWebView = WKWebView.pigeon_detached();
 
-        final AuthenticationChallengeResponse authReply =
-            await CapturingNavigationDelegate.lastCreatedDelegate
-                .didReceiveAuthenticationChallenge(
-                  testDelegate,
-                  testWebView,
-                  mockChallenge,
-                );
+        final List<Object?> authReply = await CapturingNavigationDelegate
+            .lastCreatedDelegate
+            .didReceiveAuthenticationChallenge(
+              testDelegate,
+              testWebView,
+              mockChallenge,
+            );
 
         expect(
-          authReply.disposition,
+          authReply[0],
           UrlSessionAuthChallengeDisposition.performDefaultHandling,
         );
-        expect(authReply.credential, isNull);
+        expect(authReply[1], isNull);
+      },
+    );
+
+    test('setOnSSlAuthError enables native SSL challenge handling', () async {
+      PigeonOverrides.wKNavigationDelegate_new =
+          CapturingNavigationDelegate.new;
+      final iosNavigationDelegate = WebKitNavigationDelegate(
+        const WebKitNavigationDelegateCreationParams(),
+      );
+
+      expect(
+        CapturingNavigationDelegate.lastCreatedDelegate.handlesSslAuthError,
+        isFalse,
+      );
+
+      await iosNavigationDelegate.setOnSSlAuthError((_) {});
+
+      expect(
+        CapturingNavigationDelegate.lastCreatedDelegate.handlesSslAuthError,
+        isTrue,
+      );
+      expect(
+        CapturingNavigationDelegate.lastCreatedDelegate.handlesHttpAuthRequest,
+        isFalse,
+      );
+    });
+
+    test(
+      'setOnHttpAuthRequest enables native HTTP auth challenge handling',
+      () async {
+        PigeonOverrides.wKNavigationDelegate_new =
+            CapturingNavigationDelegate.new;
+        final iosNavigationDelegate = WebKitNavigationDelegate(
+          const WebKitNavigationDelegateCreationParams(),
+        );
+
+        expect(
+          CapturingNavigationDelegate
+              .lastCreatedDelegate
+              .handlesHttpAuthRequest,
+          isFalse,
+        );
+
+        await iosNavigationDelegate.setOnHttpAuthRequest((_) {});
+
+        expect(
+          CapturingNavigationDelegate
+              .lastCreatedDelegate
+              .handlesHttpAuthRequest,
+          isTrue,
+        );
+        expect(
+          CapturingNavigationDelegate.lastCreatedDelegate.handlesSslAuthError,
+          isFalse,
+        );
       },
     );
   });
 }
 
 // Records the last created instance of itself.
+// ignore: must_be_immutable
 class CapturingNavigationDelegate extends WKNavigationDelegate {
   CapturingNavigationDelegate({
     super.didFinishNavigation,
@@ -821,10 +831,22 @@ class CapturingNavigationDelegate extends WKNavigationDelegate {
           return NavigationResponsePolicy.cancel;
         },
         didReceiveAuthenticationChallenge: (_, __, ___) async {
-          return AuthenticationChallengeResponse.pigeon_detached(
-            disposition:
-                UrlSessionAuthChallengeDisposition.performDefaultHandling,
-          );
+          return <Object?>[
+            UrlSessionAuthChallengeDisposition.performDefaultHandling,
+            null,
+          ];
         },
       );
+
+  bool handlesHttpAuthRequest = false;
+  bool handlesSslAuthError = false;
+
+  @override
+  Future<void> setChallengeHandling(
+    bool handlesHttpAuthRequest,
+    bool handlesSslAuthError,
+  ) async {
+    this.handlesHttpAuthRequest = handlesHttpAuthRequest;
+    this.handlesSslAuthError = handlesSslAuthError;
+  }
 }

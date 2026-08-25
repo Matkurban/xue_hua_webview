@@ -36,48 +36,52 @@ class _BilibiliPageState extends State<BilibiliPage> {
   void initState() {
     super.initState();
     _controller = WebViewController();
+    _configureAndLoad();
+  }
 
+  Future<void> _configureAndLoad() async {
     if (!isWeb()) {
-      _controller
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onProgress: (int progress) {
-              if (mounted) {
-                setState(() {
-                  _progress = progress;
-                });
-              }
-            },
-            onPageStarted: (String url) {
-              debugPrint('Loading $url');
-            },
-            onPageFinished: (String url) {
-              debugPrint('Finished $url');
-              if (mounted) {
-                setState(() {
-                  _progress = 100;
-                });
-              }
-            },
-            onWebResourceError: (WebResourceError error) {
-              debugPrint(
-                'WebView error ${error.errorCode}: '
-                '${error.description} (${error.url})',
-              );
-            },
-          ),
-        );
+      await _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+      await _controller.setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            if (mounted) {
+              setState(() {
+                _progress = progress;
+              });
+            }
+          },
+          onPageStarted: (String url) {
+            debugPrint('Loading $url');
+          },
+          onPageFinished: (String url) {
+            debugPrint('Finished $url');
+            if (mounted) {
+              setState(() {
+                _progress = 100;
+              });
+            }
+          },
+          onWebResourceError: (WebResourceError error) {
+            debugPrint(
+              'WebView error ${error.errorCode}: '
+              '${error.description} (${error.url})',
+            );
+          },
+        ),
+      );
     }
 
-    _controller.loadRequest(Uri.parse('https://www.bilibili.com'));
+    await _controller.loadRequest(Uri.parse('https://www.bilibili.com'));
   }
 
   Future<void> _onDemoSelected(String value) async {
     switch (value) {
       case 'async':
         final JavaScriptAsyncResult result = await _controller
-            .runJavaScriptAsync('return await Promise.resolve(document.title);');
+            .runJavaScriptAsync(
+              'return await Promise.resolve(document.title);',
+            );
         if (!mounted) {
           return;
         }
@@ -109,9 +113,9 @@ class _BilibiliPageState extends State<BilibiliPage> {
         if (!mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Website data cleared.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Website data cleared.')));
       case 'headless':
         final HeadlessWebView headless = HeadlessWebView();
         await headless.controller.setJavaScriptMode(

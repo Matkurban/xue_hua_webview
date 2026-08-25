@@ -33,6 +33,8 @@ Set the deployment target to iOS 13.0 or newer. Add `Info.plist` keys for any re
 <string>This app allows pages to request your current location.</string>
 ```
 
+HTTPS pages load without extra App Transport Security (ATS) exceptions. Cleartext HTTP is blocked by ATS unless the host app adds an exception in `Info.plist` (for example `NSExceptionDomains` for a specific host). Do not enable `NSAllowsArbitraryLoads` unless you accept the security trade-off.
+
 For App-Bound Domains, configure the domains in the host app and construct the controller with `WebKitWebViewControllerCreationParams(limitsNavigationsToAppBoundDomains: true)`.
 
 ## macOS

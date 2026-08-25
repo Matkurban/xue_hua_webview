@@ -8,6 +8,8 @@ import WebKit
 public class NavigationDelegateImpl: NSObject, WKNavigationDelegate {
   let api: PigeonApiProtocolWKNavigationDelegate
   unowned let registrar: ProxyAPIRegistrar
+  var handlesHttpAuthRequest = false
+  var handlesSslAuthError = false
 
   init(api: PigeonApiProtocolWKNavigationDelegate, registrar: ProxyAPIRegistrar) {
     self.api = api
@@ -83,74 +85,14 @@ public class NavigationDelegateImpl: NSObject, WKNavigationDelegate {
       _ webView: WKWebView, decidePolicyFor navigationAction: WebKit.WKNavigationAction,
       decisionHandler: @escaping @MainActor (WebKit.WKNavigationActionPolicy) -> Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.decidePolicyForNavigationAction(
-          pigeonInstance: self, webView: webView, navigationAction: navigationAction
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let policy):
-              switch policy {
-              case .allow:
-                decisionHandler(.allow)
-              case .cancel:
-                decisionHandler(.cancel)
-              case .download:
-                if #available(iOS 14.5, macOS 11.3, *) {
-                  decisionHandler(.download)
-                } else {
-                  decisionHandler(.cancel)
-                  assertionFailure(
-                    self.registrar.createUnsupportedVersionMessage(
-                      "WKNavigationActionPolicy.download",
-                      versionRequirements: "iOS 14.5, macOS 11.3"
-                    ))
-                }
-              }
-            case .failure(let error):
-              decisionHandler(.cancel)
-              onFailure("WKNavigationDelegate.decidePolicyForNavigationAction", error)
-            }
-          }
-        }
-      }
+      decidePolicy(for: navigationAction, webView: webView, decisionHandler: decisionHandler)
     }
   #else
     public func webView(
       _ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
       decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.decidePolicyForNavigationAction(
-          pigeonInstance: self, webView: webView, navigationAction: navigationAction
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let policy):
-              switch policy {
-              case .allow:
-                decisionHandler(.allow)
-              case .cancel:
-                decisionHandler(.cancel)
-              case .download:
-                if #available(iOS 14.5, macOS 11.3, *) {
-                  decisionHandler(.download)
-                } else {
-                  decisionHandler(.cancel)
-                  assertionFailure(
-                    self.registrar.createUnsupportedVersionMessage(
-                      "WKNavigationActionPolicy.download",
-                      versionRequirements: "iOS 14.5, macOS 11.3"
-                    ))
-                }
-              }
-            case .failure(let error):
-              decisionHandler(.cancel)
-              onFailure("WKNavigationDelegate.decidePolicyForNavigationAction", error)
-            }
-          }
-        }
-      }
+      decidePolicy(for: navigationAction, webView: webView, decisionHandler: decisionHandler)
     }
   #endif
 
@@ -159,74 +101,14 @@ public class NavigationDelegateImpl: NSObject, WKNavigationDelegate {
       _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
       decisionHandler: @escaping @MainActor (WKNavigationResponsePolicy) -> Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.decidePolicyForNavigationResponse(
-          pigeonInstance: self, webView: webView, navigationResponse: navigationResponse
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let policy):
-              switch policy {
-              case .allow:
-                decisionHandler(.allow)
-              case .cancel:
-                decisionHandler(.cancel)
-              case .download:
-                if #available(iOS 14.5, macOS 11.3, *) {
-                  decisionHandler(.download)
-                } else {
-                  decisionHandler(.cancel)
-                  assertionFailure(
-                    self.registrar.createUnsupportedVersionMessage(
-                      "WKNavigationResponsePolicy.download",
-                      versionRequirements: "iOS 14.5, macOS 11.3"
-                    ))
-                }
-              }
-            case .failure(let error):
-              decisionHandler(.cancel)
-              onFailure("WKNavigationDelegate.decidePolicyForNavigationResponse", error)
-            }
-          }
-        }
-      }
+      decidePolicy(for: navigationResponse, webView: webView, decisionHandler: decisionHandler)
     }
   #else
     public func webView(
       _ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
       decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.decidePolicyForNavigationResponse(
-          pigeonInstance: self, webView: webView, navigationResponse: navigationResponse
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let policy):
-              switch policy {
-              case .allow:
-                decisionHandler(.allow)
-              case .cancel:
-                decisionHandler(.cancel)
-              case .download:
-                if #available(iOS 14.5, macOS 11.3, *) {
-                  decisionHandler(.download)
-                } else {
-                  decisionHandler(.cancel)
-                  assertionFailure(
-                    self.registrar.createUnsupportedVersionMessage(
-                      "WKNavigationResponsePolicy.download",
-                      versionRequirements: "iOS 14.5, macOS 11.3"
-                    ))
-                }
-              }
-            case .failure(let error):
-              decisionHandler(.cancel)
-              onFailure("WKNavigationDelegate.decidePolicyForNavigationResponse", error)
-            }
-          }
-        }
-      }
+      decidePolicy(for: navigationResponse, webView: webView, decisionHandler: decisionHandler)
     }
   #endif
 
@@ -234,25 +116,10 @@ public class NavigationDelegateImpl: NSObject, WKNavigationDelegate {
     public func webView(
       _ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
       completionHandler:
-        @escaping @MainActor (URLSession.AuthChallengeDisposition, URLCredential?)
-        ->
+        @escaping @MainActor (URLSession.AuthChallengeDisposition, URLCredential?) ->
         Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.didReceiveAuthenticationChallenge(
-          pigeonInstance: self, webView: webView, challenge: challenge
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let response):
-              completionHandler(response.disposition, response.credential)
-            case .failure(let error):
-              completionHandler(.cancelAuthenticationChallenge, nil)
-              onFailure("WKNavigationDelegate.didReceiveAuthenticationChallenge", error)
-            }
-          }
-        }
-      }
+      handle(challenge, webView: webView, completionHandler: completionHandler)
     }
   #else
     public func webView(
@@ -261,23 +128,166 @@ public class NavigationDelegateImpl: NSObject, WKNavigationDelegate {
         @escaping (URLSession.AuthChallengeDisposition, URLCredential?) ->
         Void
     ) {
-      registrar.dispatchOnMainThread { onFailure in
-        self.api.didReceiveAuthenticationChallenge(
-          pigeonInstance: self, webView: webView, challenge: challenge
-        ) { result in
-          DispatchQueue.main.async {
-            switch result {
-            case .success(let response):
-              completionHandler(response.disposition, response.credential)
-            case .failure(let error):
-              completionHandler(.cancelAuthenticationChallenge, nil)
-              onFailure("WKNavigationDelegate.didReceiveAuthenticationChallenge", error)
-            }
+      handle(challenge, webView: webView, completionHandler: completionHandler)
+    }
+  #endif
+
+  private func decidePolicy(
+    for navigationAction: WKNavigationAction,
+    webView: WKWebView,
+    decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+  ) {
+    registrar.dispatchOnMainThread { onFailure in
+      self.api.decidePolicyForNavigationAction(
+        pigeonInstance: self, webView: webView, navigationAction: navigationAction
+      ) { result in
+        DispatchQueue.main.async {
+          switch result {
+          case .success(let policy):
+            decisionHandler(self.nativeNavigationActionPolicy(policy))
+          case .failure(let error):
+            // Fail open so a broken Dart round trip cannot block HTTPS loads.
+            decisionHandler(.allow)
+            onFailure("WKNavigationDelegate.decidePolicyForNavigationAction", error)
           }
         }
       }
     }
-  #endif
+  }
+
+  private func decidePolicy(
+    for navigationResponse: WKNavigationResponse,
+    webView: WKWebView,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
+    registrar.dispatchOnMainThread { onFailure in
+      self.api.decidePolicyForNavigationResponse(
+        pigeonInstance: self, webView: webView, navigationResponse: navigationResponse
+      ) { result in
+        DispatchQueue.main.async {
+          switch result {
+          case .success(let policy):
+            decisionHandler(self.nativeNavigationResponsePolicy(policy))
+          case .failure(let error):
+            decisionHandler(.allow)
+            onFailure("WKNavigationDelegate.decidePolicyForNavigationResponse", error)
+          }
+        }
+      }
+    }
+  }
+
+  private func handle(
+    _ challenge: URLAuthenticationChallenge,
+    webView: WKWebView,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
+    if !shouldForwardAuthenticationChallenge(challenge) {
+      completionHandler(.performDefaultHandling, nil)
+      return
+    }
+
+    registrar.dispatchOnMainThread { onFailure in
+      self.api.didReceiveAuthenticationChallenge(
+        pigeonInstance: self, webView: webView, challenge: challenge
+      ) { result in
+        DispatchQueue.main.async {
+          switch result {
+          case .success(let values):
+            completionHandler(
+              self.nativeAuthChallengeDisposition(from: values),
+              self.nativeAuthChallengeCredential(from: values))
+          case .failure(let error):
+            // Cancelling here rejects TLS for every HTTPS page.
+            completionHandler(.performDefaultHandling, nil)
+            onFailure("WKNavigationDelegate.didReceiveAuthenticationChallenge", error)
+          }
+        }
+      }
+    }
+  }
+
+  func shouldForwardAuthenticationChallenge(_ challenge: URLAuthenticationChallenge) -> Bool {
+    switch challenge.protectionSpace.authenticationMethod {
+    case NSURLAuthenticationMethodServerTrust:
+      return handlesSslAuthError
+    case NSURLAuthenticationMethodHTTPBasic, NSURLAuthenticationMethodNTLM:
+      return handlesHttpAuthRequest
+    default:
+      return false
+    }
+  }
+
+  private func nativeNavigationActionPolicy(_ policy: NavigationActionPolicy)
+    -> WKNavigationActionPolicy
+  {
+    switch policy {
+    case .allow:
+      return .allow
+    case .cancel:
+      return .cancel
+    case .download:
+      if #available(iOS 14.5, macOS 11.3, *) {
+        return .download
+      } else {
+        assertionFailure(
+          registrar.createUnsupportedVersionMessage(
+            "WKNavigationActionPolicy.download",
+            versionRequirements: "iOS 14.5, macOS 11.3"
+          ))
+        return .cancel
+      }
+    }
+  }
+
+  private func nativeNavigationResponsePolicy(_ policy: NavigationResponsePolicy)
+    -> WKNavigationResponsePolicy
+  {
+    switch policy {
+    case .allow:
+      return .allow
+    case .cancel:
+      return .cancel
+    case .download:
+      if #available(iOS 14.5, macOS 11.3, *) {
+        return .download
+      } else {
+        assertionFailure(
+          registrar.createUnsupportedVersionMessage(
+            "WKNavigationResponsePolicy.download",
+            versionRequirements: "iOS 14.5, macOS 11.3"
+          ))
+        return .cancel
+      }
+    }
+  }
+
+  private func nativeAuthChallengeDisposition(from values: [Any?])
+    -> URLSession.AuthChallengeDisposition
+  {
+    guard let disposition = values.first as? UrlSessionAuthChallengeDisposition else {
+      return .performDefaultHandling
+    }
+    switch disposition {
+    case .useCredential:
+      return .useCredential
+    case .performDefaultHandling:
+      return .performDefaultHandling
+    case .cancelAuthenticationChallenge:
+      return .cancelAuthenticationChallenge
+    case .rejectProtectionSpace:
+      return .rejectProtectionSpace
+    case .unknown:
+      return .performDefaultHandling
+    }
+  }
+
+  private func nativeAuthChallengeCredential(from values: [Any?]) -> URLCredential? {
+    guard values.count > 1 else {
+      return nil
+    }
+    return values[1] as? URLCredential
+  }
 }
 
 /// ProxyApi implementation for `WKNavigationDelegate`.
@@ -290,5 +300,16 @@ class NavigationDelegateProxyAPIDelegate: PigeonApiDelegateWKNavigationDelegate 
   {
     return NavigationDelegateImpl(
       api: pigeonApi, registrar: pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar)
+  }
+
+  func setChallengeHandling(
+    pigeonApi: PigeonApiWKNavigationDelegate, pigeonInstance: WKNavigationDelegate,
+    handlesHttpAuthRequest: Bool, handlesSslAuthError: Bool
+  ) throws {
+    guard let impl = pigeonInstance as? NavigationDelegateImpl else {
+      return
+    }
+    impl.handlesHttpAuthRequest = handlesHttpAuthRequest
+    impl.handlesSslAuthError = handlesSslAuthError
   }
 }

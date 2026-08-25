@@ -30,6 +30,8 @@ title: 平台设置
 <string>Allow pages to request location.</string>
 ```
 
+HTTPS 页面不需要额外的 App Transport Security（ATS）例外。明文 HTTP 会被 ATS 拦截，除非宿主应用在 `Info.plist` 中为对应域名添加例外（例如 `NSExceptionDomains`）。不要默认开启 `NSAllowsArbitraryLoads`，除非你明确接受其安全代价。
+
 App-Bound Domains 需要宿主应用配置域名，并用 `WebKitWebViewControllerCreationParams(limitsNavigationsToAppBoundDomains: true)` 创建控制器。
 
 ## macOS

@@ -526,7 +526,7 @@ class WebKitWebViewController extends PlatformWebViewController {
     return _webView.load(
       URLRequest(url: params.uri.toString())
         ..setAllHttpHeaderFields(params.headers)
-        ..setHttpMethod(params.method.name)
+        ..setHttpMethod(params.method.name.toUpperCase())
         ..setHttpBody(params.body),
     );
   }
@@ -1545,9 +1545,8 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
               }
             }
 
-            return AuthenticationChallengeResponse.createAsync(
+            return _authenticationChallengeReply(
               UrlSessionAuthChallengeDisposition.performDefaultHandling,
-              null,
             );
           },
     );
@@ -1610,18 +1609,34 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
     HttpAuthRequestCallback onHttpAuthRequest,
   ) async {
     _onHttpAuthRequest = onHttpAuthRequest;
+    await _syncChallengeHandling();
   }
 
   @override
   Future<void> setOnSSlAuthError(SslAuthErrorCallback onSslAuthError) async {
     _onSslAuthError = onSslAuthError;
+    await _syncChallengeHandling();
   }
 
-  static Future<AuthenticationChallengeResponse> _handleHttpAuthRequest({
+  Future<void> _syncChallengeHandling() {
+    return _navigationDelegate.setChallengeHandling(
+      _onHttpAuthRequest != null,
+      _onSslAuthError != null,
+    );
+  }
+
+  static List<Object?> _authenticationChallengeReply(
+    UrlSessionAuthChallengeDisposition disposition, [
+    URLCredential? credential,
+  ]) {
+    return <Object?>[disposition, credential];
+  }
+
+  static Future<List<Object?>> _handleHttpAuthRequest({
     required void Function(HttpAuthRequest) onHttpAuthRequest,
     required URLProtectionSpace protectionSpace,
   }) {
-    final responseCompleter = Completer<AuthenticationChallengeResponse>();
+    final responseCompleter = Completer<List<Object?>>();
 
     onHttpAuthRequest(
       HttpAuthRequest(
@@ -1629,7 +1644,7 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
         realm: protectionSpace.realm,
         onProceed: (WebViewCredential credential) async {
           responseCompleter.complete(
-            await AuthenticationChallengeResponse.createAsync(
+            _authenticationChallengeReply(
               UrlSessionAuthChallengeDisposition.useCredential,
               await URLCredential.withUserAsync(
                 credential.user,
@@ -1641,9 +1656,8 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
         },
         onCancel: () async {
           responseCompleter.complete(
-            await AuthenticationChallengeResponse.createAsync(
+            _authenticationChallengeReply(
               UrlSessionAuthChallengeDisposition.cancelAuthenticationChallenge,
-              null,
             ),
           );
         },
@@ -1653,13 +1667,13 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
     return responseCompleter.future;
   }
 
-  static Future<AuthenticationChallengeResponse> _handleSslAuthError({
+  static Future<List<Object?>> _handleSslAuthError({
     required void Function(PlatformSslAuthError) onSslAuthError,
     required SecTrust serverTrust,
     required URLProtectionSpace protectionSpace,
     required PlatformException secTrustException,
   }) async {
-    final responseCompleter = Completer<AuthenticationChallengeResponse>();
+    final responseCompleter = Completer<List<Object?>>();
 
     final List<SecCertificate> certificates =
         (await SecTrust.copyCertificateChain(serverTrust)) ??
@@ -1683,10 +1697,7 @@ class WebKitNavigationDelegate extends PlatformNavigationDelegate {
               URLCredential? credential,
             ) async {
               responseCompleter.complete(
-                await AuthenticationChallengeResponse.createAsync(
-                  disposition,
-                  credential,
-                ),
+                _authenticationChallengeReply(disposition, credential),
               );
             },
       ),
