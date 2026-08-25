@@ -137,8 +137,6 @@ class _BilibiliPageState extends State<BilibiliPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget webView = WebViewWidget(controller: _controller);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bilibili'),
@@ -197,7 +195,7 @@ class _BilibiliPageState extends State<BilibiliPage> {
               : const SizedBox(height: 3),
         ),
       ),
-      body: webView,
+      body: WebViewWidget(controller: _controller),
     );
   }
 }
