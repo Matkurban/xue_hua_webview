@@ -1,4 +1,4 @@
-## 1.0.2
+## 1.0.3
 
 * Fix iOS and macOS HTTPS loads that failed after a `NavigationDelegate` was set, because TLS server-trust challenges were cancelled when the Dart round trip failed.
 * Use uppercase HTTP methods (`GET` / `POST`) for WKWebView `loadRequest`.
