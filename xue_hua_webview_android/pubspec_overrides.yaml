@@ -1,3 +1,4 @@
 dependency_overrides:
+  meta: 1.18.3
   xue_hua_webview_platform_interface:
     path: ../xue_hua_webview_platform_interface

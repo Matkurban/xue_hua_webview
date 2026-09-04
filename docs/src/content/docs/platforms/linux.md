@@ -3,7 +3,7 @@ title: Linux
 description: WebKitGTK implementation, automatic GtkOverlay integration, APIs, and limits.
 ---
 
-Linux is provided by `xue_hua_webview_linux 1.0.1` and uses WebKitGTK.
+Linux is provided by `xue_hua_webview_linux 1.0.2` and uses WebKitGTK.
 
 ## Engine
 

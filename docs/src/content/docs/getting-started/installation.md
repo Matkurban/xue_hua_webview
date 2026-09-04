@@ -45,9 +45,9 @@ If you cast to a platform implementation, add that package explicitly so the imp
 ```yaml
 dependencies:
   xue_hua_webview: ^1.1.0
-  xue_hua_webview_windows: ^1.0.0
-  xue_hua_webview_linux: ^1.0.0
-  xue_hua_webview_web: ^1.0.0
+  xue_hua_webview_windows: ^1.0.3
+  xue_hua_webview_linux: ^1.0.2
+  xue_hua_webview_web: ^1.0.2
   xue_hua_webview_android: ^1.1.0
   xue_hua_webview_wkwebview: ^1.1.0
 ```
@@ -67,7 +67,8 @@ import 'package:xue_hua_webview_wkwebview/xue_hua_webview_wkwebview.dart';
 
 The `1.1.0` release updates `xue_hua_webview`, `xue_hua_webview_android`, and
 `xue_hua_webview_wkwebview`. The wrapper depends on
-`xue_hua_webview_platform_interface ^1.0.0`, `xue_hua_webview_android ^1.1.0`, and
-`xue_hua_webview_wkwebview ^1.1.0`.
+`xue_hua_webview_platform_interface ^1.0.2`, `xue_hua_webview_android ^1.1.0`,
+`xue_hua_webview_wkwebview ^1.1.0`, `xue_hua_webview_windows ^1.0.3`,
+`xue_hua_webview_linux ^1.0.2`, and `xue_hua_webview_web ^1.0.2`.
 
 Keep the platform packages on the same minor line as the wrapper unless you are intentionally testing a platform package in isolation.

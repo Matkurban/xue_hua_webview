@@ -1,5 +1,5 @@
 name: xue_hua_webview_windows
-version: 1.0.2
+version: 1.0.3
 description: A Flutter plugin that provides a WebView widget on Windows.
 repository: https://github.com/Matkurban/xue_hua_webview
 homepage: https://github.com/Matkurban/xue_hua_webview
@@ -20,14 +20,17 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  meta: ^1.16.0
+  meta: ^1.18.3
   path: ^1.9.1
-  xue_hua_webview_platform_interface: ^1.0.0
+  xue_hua_webview_platform_interface: ^1.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pigeon: ">=26.3.4 <27.1.1"
+  pigeon: ^28.0.0
+
+dependency_overrides:
+  meta: 1.18.3
 
 topics:
   - webview

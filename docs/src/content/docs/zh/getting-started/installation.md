@@ -25,9 +25,9 @@ flutter pub get
 ```yaml
 dependencies:
   xue_hua_webview: ^1.1.0
-  xue_hua_webview_windows: ^1.0.0
-  xue_hua_webview_linux: ^1.0.0
-  xue_hua_webview_web: ^1.0.0
+  xue_hua_webview_windows: ^1.0.3
+  xue_hua_webview_linux: ^1.0.2
+  xue_hua_webview_web: ^1.0.2
   xue_hua_webview_android: ^1.1.0
   xue_hua_webview_wkwebview: ^1.1.0
 ```

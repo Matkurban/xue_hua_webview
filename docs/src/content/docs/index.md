@@ -8,7 +8,7 @@ Windows, Linux, and Web. Its
 [`xue_hua_webview_platform_interface`](https://pub.dev/packages/xue_hua_webview_platform_interface)
 package is forked from Flutter's official platform interface.
 
-This unversioned route documents the latest `1.0.1` release.
+This unversioned route documents the latest `1.1.0` release.
 
 ## Platform Compatibility
 
