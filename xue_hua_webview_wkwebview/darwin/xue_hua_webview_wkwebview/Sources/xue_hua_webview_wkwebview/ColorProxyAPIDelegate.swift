@@ -5,7 +5,7 @@
 import Foundation
 
 #if os(iOS)
-  import UIKit
+    import UIKit
 #endif
 
 /// ProxyApi implementation for `UIColor`.
@@ -13,11 +13,11 @@ import Foundation
 /// This class may handle instantiating native object instances that are attached to a Dart instance
 /// or handle method calls on the associated native class or an instance of that class.
 class ColorProxyAPIDelegate: PigeonApiDelegateUIColor {
-  #if os(iOS)
-    func pigeonDefaultConstructor(
-      pigeonApi: PigeonApiUIColor, red: Double, green: Double, blue: Double, alpha: Double
-    ) throws -> UIColor {
-      return UIColor(red: red, green: green, blue: blue, alpha: alpha)
-    }
-  #endif
+    #if os(iOS)
+        func pigeonDefaultConstructor(
+            pigeonApi _: PigeonApiUIColor, red: Double, green: Double, blue: Double, alpha: Double
+        ) throws -> UIColor {
+            return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+        }
+    #endif
 }

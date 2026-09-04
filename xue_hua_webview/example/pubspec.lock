@@ -195,10 +195,10 @@ packages:
     dependency: transitive
     description:
       name: process
-      sha256: c6248e4526673988586e8c00bb22a49210c258dc91df5227d5da9748ecf79744
+      sha256: "4242ba3508d37e01808bdf71ad1d5bb93a8d671bf2e7450e6b1b353fb0808891"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.5"
+    version: "5.0.6"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -272,10 +272,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "45caa6c5917fa127b5dbcfbd1fa60b14e583afdc08bfc96dda38886ca252eb60"
+      sha256: "5f37239c4851efcef929cea7824e76df7f2f0970aef85d66bbc430afa40e72f0"
       url: "https://pub.dev"
     source: hosted
-    version: "15.0.2"
+    version: "15.3.0"
   web:
     dependency: transitive
     description:
@@ -298,14 +298,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.3"
+    version: "1.1.0"
   xue_hua_webview_android:
     dependency: "direct overridden"
     description:
       path: "../../xue_hua_webview_android"
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.1.0"
   xue_hua_webview_linux:
     dependency: "direct overridden"
     description:
@@ -340,7 +340,7 @@ packages:
       path: "../../xue_hua_webview_wkwebview"
       relative: true
     source: path
-    version: "1.0.3"
+    version: "1.1.0"
 sdks:
   dart: ">=3.12.0 <4.0.0"
   flutter: ">=3.44.0"

@@ -10,11 +10,11 @@ import Foundation
 /// responds with a completion handler that takes two values. The wrapper returns this class instead to handle
 /// this scenario.
 class AuthenticationChallengeResponse {
-  let disposition: URLSession.AuthChallengeDisposition
-  let credential: URLCredential?
+    let disposition: URLSession.AuthChallengeDisposition
+    let credential: URLCredential?
 
-  init(disposition: URLSession.AuthChallengeDisposition, credential: URLCredential?) {
-    self.disposition = disposition
-    self.credential = credential
-  }
+    init(disposition: URLSession.AuthChallengeDisposition, credential: URLCredential?) {
+        self.disposition = disposition
+        self.credential = credential
+    }
 }

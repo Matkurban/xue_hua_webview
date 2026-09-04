@@ -3,7 +3,7 @@ title: Android
 description: Android WebView implementation, APIs, and platform limits.
 ---
 
-Android is provided by `xue_hua_webview_android ^1.0.0`. `xue_hua_webview` registers it as the default Android implementation.
+Android is provided by `xue_hua_webview_android ^1.1.0`. `xue_hua_webview` registers it as the default Android implementation.
 
 ## Engine
 
@@ -38,7 +38,7 @@ final controller = WebViewController.fromPlatformCreationParams(params);
 | `setUseWideViewPort(bool use)` | Enables viewport meta tag and wide viewport behavior. |
 | `setAllowContentAccess(bool enabled)` | Allows or blocks `content://` URL access. |
 | `setGeolocationEnabled(bool enabled)` | Enables WebView geolocation support. |
-| `setOnShowFileSelector(callback)` | Handles `<input type="file">`. |
+| `setOnShowFileSelector(callback)` | Optional override for `<input type="file">`. Built-in picker runs when unset. |
 | `setGeolocationPermissionsPromptCallbacks(...)` | Handles Geolocation API permission prompts. |
 | `setCustomWidgetCallbacks(...)` | Handles fullscreen custom views, commonly video. |
 | `setMixedContentMode(MixedContentMode mode)` | Controls HTTPS pages loading HTTP content. |
@@ -123,6 +123,17 @@ Android supports the common `camera` and `microphone` resource types, plus:
 
 ## File Selector
 
+`<input type="file">` uses a built-in picker when `setOnShowFileSelector` is
+unset:
+
+- Image or video accept types use the Android Photo Picker (no storage permission).
+- Other MIME types use `ACTION_GET_CONTENT`.
+- `capture` launches the camera after a runtime `CAMERA` grant.
+- Multiple selection follows `FileSelectorMode.openMultiple`.
+- Cancel, permission denial, and errors call `filePathCallback` with `null`.
+
+Optional override:
+
 ```dart
 await (controller.platform as AndroidWebViewController)
     .setOnShowFileSelector((FileSelectorParams params) async {
@@ -133,7 +144,22 @@ await (controller.platform as AndroidWebViewController)
 });
 ```
 
+Return file URI strings such as `content://...`. An empty list cancels.
 `FileSelectorMode` values are `open`, `openMultiple`, and `save`.
+
+Declare `CAMERA` in the host manifest for capture. Do not add `READ_MEDIA_*`
+unless the custom callback reads the MediaStore.
+
+## External App URLs
+
+Custom schemes from page content (`bilibili://`, `weixin://`, `intent://`,
+`mailto:`, `tel:`) are opened with `ACTION_VIEW` and never loaded in WebView.
+Chrome `intent://` URIs use `Intent.parseUri`. If the app is missing, an
+`S.browser_fallback_url` that is `http`/`https` is loaded back in the WebView.
+`startActivity` does not require `<queries>` entries for those schemes. A
+missing app fails silently.
+
+`onNavigationRequest` still sees the URL. `prevent` blocks the launch.
 
 ## Cookies and Native Access
 

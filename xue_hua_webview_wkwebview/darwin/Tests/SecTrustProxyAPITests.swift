@@ -3,124 +3,125 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 #if os(iOS)
-  import Flutter
+    import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+    import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+    #error("Unsupported platform.")
 #endif
 
 class SecTrustProxyAPITests: XCTestCase {
-  func createTrust(delegate: TestSecTrustProxyAPIDelegate) -> SecTrustWrapper {
-    var trust: SecTrust?
-    SecTrustCreateWithCertificates(
-      [createTestCertificate()] as AnyObject, SecPolicyCreateBasicX509(), &trust)
+    func createTrust(delegate _: TestSecTrustProxyAPIDelegate) -> SecTrustWrapper {
+        var trust: SecTrust?
+        SecTrustCreateWithCertificates(
+            [createTestCertificate()] as AnyObject, SecPolicyCreateBasicX509(), &trust
+        )
 
-    return SecTrustWrapper(value: trust!)
-  }
-
-  func testEvaluateWithError() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecTrustProxyAPIDelegate()
-    let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
-
-    let expect = expectation(description: "Wait for setCookie.")
-    let trust = createTrust(delegate: delegate)
-    var resultValue: Bool?
-
-    api.pigeonDelegate.evaluateWithError(pigeonApi: api, trust: trust) { result in
-      switch result {
-      case .success(let value):
-        resultValue = value
-      case .failure(_):
-        break
-      }
-      expect.fulfill()
+        return SecTrustWrapper(value: trust!)
     }
 
-    wait(for: [expect], timeout: 5.0)
-    XCTAssertEqual(resultValue, true)
-  }
+    func testEvaluateWithError() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecTrustProxyAPIDelegate()
+        let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
 
-  func testCopyExceptions() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecTrustProxyAPIDelegate()
-    let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
+        let expect = expectation(description: "Wait for setCookie.")
+        let trust = createTrust(delegate: delegate)
+        var resultValue: Bool?
 
-    let trust = createTrust(delegate: delegate)
-    let value = try? api.pigeonDelegate.copyExceptions(pigeonApi: api, trust: trust)
+        api.pigeonDelegate.evaluateWithError(pigeonApi: api, trust: trust) { result in
+            switch result {
+            case let .success(value):
+                resultValue = value
+            case .failure:
+                break
+            }
+            expect.fulfill()
+        }
 
-    XCTAssertEqual(value?.data, Data())
-  }
+        wait(for: [expect], timeout: 5.0)
+        XCTAssertEqual(resultValue, true)
+    }
 
-  func testSetExceptions() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecTrustProxyAPIDelegate()
-    let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
+    func testCopyExceptions() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecTrustProxyAPIDelegate()
+        let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
 
-    let trust = createTrust(delegate: delegate)
-    let value = try? api.pigeonDelegate.setExceptions(
-      pigeonApi: api, trust: trust, exceptions: FlutterStandardTypedData(bytes: Data()))
+        let trust = createTrust(delegate: delegate)
+        let value = try? api.pigeonDelegate.copyExceptions(pigeonApi: api, trust: trust)
 
-    XCTAssertEqual(value, false)
-  }
+        XCTAssertEqual(value?.data, Data())
+    }
 
-  func testGetTrustResult() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecTrustProxyAPIDelegate()
-    let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
+    func testSetExceptions() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecTrustProxyAPIDelegate()
+        let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
 
-    let trust = createTrust(delegate: delegate)
-    let value = try? api.pigeonDelegate.getTrustResult(pigeonApi: api, trust: trust)
+        let trust = createTrust(delegate: delegate)
+        let value = try? api.pigeonDelegate.setExceptions(
+            pigeonApi: api, trust: trust, exceptions: FlutterStandardTypedData(bytes: Data())
+        )
 
-    XCTAssertEqual(value?.result, SecTrustResultType.invalid)
-    XCTAssertEqual(value?.resultCode, -1)
-  }
+        XCTAssertEqual(value, false)
+    }
 
-  func testCopyCertificateChain() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecTrustProxyAPIDelegate()
-    let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
+    func testGetTrustResult() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecTrustProxyAPIDelegate()
+        let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
 
-    let trust = createTrust(delegate: delegate)
-    let value = try? api.pigeonDelegate.copyCertificateChain(pigeonApi: api, trust: trust)
+        let trust = createTrust(delegate: delegate)
+        let value = try? api.pigeonDelegate.getTrustResult(pigeonApi: api, trust: trust)
 
-    XCTAssertEqual(value?.count, 1)
-    XCTAssertNotNil(value?.first?.value)
-  }
+        XCTAssertEqual(value?.result, SecTrustResultType.invalid)
+        XCTAssertEqual(value?.resultCode, -1)
+    }
+
+    func testCopyCertificateChain() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecTrustProxyAPIDelegate()
+        let api = PigeonApiSecTrust(pigeonRegistrar: registrar, delegate: delegate)
+
+        let trust = createTrust(delegate: delegate)
+        let value = try? api.pigeonDelegate.copyCertificateChain(pigeonApi: api, trust: trust)
+
+        XCTAssertEqual(value?.count, 1)
+        XCTAssertNotNil(value?.first?.value)
+    }
 }
 
 class TestSecTrustProxyAPIDelegate: SecTrustProxyAPIDelegate {
-  override func secTrustEvaluateWithError(
-    _ trust: SecTrust, _ error: UnsafeMutablePointer<CFError?>?
-  ) -> Bool {
-    return true
-  }
-
-  override func secTrustCopyExceptions(_ trust: SecTrust) -> CFData? {
-    return Data() as CFData
-  }
-
-  override func secTrustSetExceptions(_ trust: SecTrust, _ exceptions: CFData?) -> Bool {
-    return false
-  }
-
-  override func secTrustGetTrustResult(
-    _ trust: SecTrust, _ result: UnsafeMutablePointer<SecTrustResultType>
-  ) -> OSStatus {
-    result.pointee = SecTrustResultType.invalid
-    return -1
-  }
-
-  override func secTrustCopyCertificateChain(_ trust: SecTrust) -> CFArray? {
-    if #available(iOS 15.0, *) {
-      return [createTestCertificate()] as CFArray
+    override func secTrustEvaluateWithError(
+        _: SecTrust, _: UnsafeMutablePointer<CFError?>?
+    ) -> Bool {
+        return true
     }
 
-    return nil
-  }
+    override func secTrustCopyExceptions(_: SecTrust) -> CFData? {
+        return Data() as CFData
+    }
+
+    override func secTrustSetExceptions(_: SecTrust, _: CFData?) -> Bool {
+        return false
+    }
+
+    override func secTrustGetTrustResult(
+        _: SecTrust, _ result: UnsafeMutablePointer<SecTrustResultType>
+    ) -> OSStatus {
+        result.pointee = SecTrustResultType.invalid
+        return -1
+    }
+
+    override func secTrustCopyCertificateChain(_: SecTrust) -> CFArray? {
+        if #available(iOS 15.0, *) {
+            return [createTestCertificate()] as CFArray
+        }
+
+        return nil
+    }
 }

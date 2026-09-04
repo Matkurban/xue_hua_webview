@@ -9,37 +9,37 @@ import Foundation
 /// This class may handle instantiating native object instances that are attached to a Dart instance
 /// or handle method calls on the associated native class or an instance of that class.
 class URLProtectionSpaceProxyAPIDelegate: PigeonApiDelegateURLProtectionSpace {
-  func host(pigeonApi: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
-    -> String
-  {
-    return pigeonInstance.host
-  }
-
-  func port(pigeonApi: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
-    -> Int64
-  {
-    return Int64(pigeonInstance.port)
-  }
-
-  func realm(pigeonApi: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
-    -> String?
-  {
-    return pigeonInstance.realm
-  }
-
-  func authenticationMethod(
-    pigeonApi: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace
-  ) throws -> String? {
-    return pigeonInstance.authenticationMethod
-  }
-
-  func getServerTrust(pigeonApi: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace)
-    throws -> SecTrustWrapper?
-  {
-    if let serverTrust = pigeonInstance.serverTrust {
-      return SecTrustWrapper(value: serverTrust)
+    func host(pigeonApi _: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
+        -> String
+    {
+        return pigeonInstance.host
     }
 
-    return nil
-  }
+    func port(pigeonApi _: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
+        -> Int64
+    {
+        return Int64(pigeonInstance.port)
+    }
+
+    func realm(pigeonApi _: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace) throws
+        -> String?
+    {
+        return pigeonInstance.realm
+    }
+
+    func authenticationMethod(
+        pigeonApi _: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace
+    ) throws -> String? {
+        return pigeonInstance.authenticationMethod
+    }
+
+    func getServerTrust(pigeonApi _: PigeonApiURLProtectionSpace, pigeonInstance: URLProtectionSpace)
+        throws -> SecTrustWrapper?
+    {
+        if let serverTrust = pigeonInstance.serverTrust {
+            return SecTrustWrapper(value: serverTrust)
+        }
+
+        return nil
+    }
 }

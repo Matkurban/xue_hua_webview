@@ -3,53 +3,54 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 #if os(iOS)
-  import Flutter
-  import UIKit
+    import Flutter
+    import UIKit
 #endif
 
 class WebViewFlutterPluginTests: XCTestCase {
-  #if os(iOS)
-    @MainActor func testRegisterAddsSceneLifeCycleDelegateWhenSupported() {
-      let registry = TestRegistry()
-      let registrar = registry.registrar(forPlugin: "")!
+    #if os(iOS)
+        @MainActor func testRegisterAddsSceneLifeCycleDelegateWhenSupported() throws {
+            let registry = TestRegistry()
+            let registrar = try XCTUnwrap(registry.registrar(forPlugin: ""))
 
-      WebViewFlutterPlugin.register(with: registrar)
+            WebViewFlutterPlugin.register(with: registrar)
 
-      let plugin = registry.registrar.plugin!
-      XCTAssertTrue(registry.registrar.sceneDelegate === plugin)
-      let sceneLifeCycleProtocol = NSProtocolFromString("FlutterSceneLifeCycleDelegate")
-      XCTAssertNotNil(sceneLifeCycleProtocol)
-      XCTAssertTrue(plugin.conforms(to: sceneLifeCycleProtocol!))
-    }
+            let plugin = try XCTUnwrap(registry.registrar.plugin)
+            XCTAssertTrue(registry.registrar.sceneDelegate === plugin)
+            let sceneLifeCycleProtocol = NSProtocolFromString("FlutterSceneLifeCycleDelegate")
+            XCTAssertNotNil(sceneLifeCycleProtocol)
+            XCTAssertTrue(try plugin.conforms(to: XCTUnwrap(sceneLifeCycleProtocol)))
+        }
 
-    func testApplicationTerminationReleasesTheInstanceManager() {
-      let plugin = WebViewFlutterPlugin(binaryMessenger: TestBinaryMessenger())
-      let view = UIView()
-      _ = plugin.proxyApiRegistrar!.instanceManager.addHostCreatedInstance(view)
+        func testApplicationTerminationReleasesTheInstanceManager() throws {
+            let plugin = WebViewFlutterPlugin(binaryMessenger: TestBinaryMessenger())
+            let view = UIView()
+            _ = try XCTUnwrap(plugin.proxyApiRegistrar?.instanceManager.addHostCreatedInstance(view))
 
-      (plugin as FlutterApplicationLifeCycleDelegate).applicationWillTerminate!(
-        UIApplication.shared)
+            (plugin as FlutterApplicationLifeCycleDelegate).applicationWillTerminate!(
+                UIApplication.shared
+            )
 
-      XCTAssertNil(plugin.proxyApiRegistrar)
+            XCTAssertNil(plugin.proxyApiRegistrar)
 
-      // Application and engine lifecycle callbacks may race during shutdown.
-      // A repeated callback must remain harmless.
-      (plugin as FlutterApplicationLifeCycleDelegate).applicationWillTerminate!(
-        UIApplication.shared)
-      XCTAssertNil(plugin.proxyApiRegistrar)
-    }
+            // Application and engine lifecycle callbacks may race during shutdown.
+            // A repeated callback must remain harmless.
+            (plugin as FlutterApplicationLifeCycleDelegate).applicationWillTerminate!(
+                UIApplication.shared
+            )
+            XCTAssertNil(plugin.proxyApiRegistrar)
+        }
 
-    func testSceneDidDisconnectDoesNotTearDownRunningEngine() {
-      let plugin = WebViewFlutterPlugin(binaryMessenger: TestBinaryMessenger())
-      XCTAssertNotNil(plugin.proxyApiRegistrar)
+        func testSceneDidDisconnectDoesNotTearDownRunningEngine() {
+            let plugin = WebViewFlutterPlugin(binaryMessenger: TestBinaryMessenger())
+            XCTAssertNotNil(plugin.proxyApiRegistrar)
 
-      plugin.perform(NSSelectorFromString("sceneDidDisconnect:"), with: nil)
+            plugin.perform(NSSelectorFromString("sceneDidDisconnect:"), with: nil)
 
-      XCTAssertNotNil(plugin.proxyApiRegistrar)
-    }
-  #endif
+            XCTAssertNotNil(plugin.proxyApiRegistrar)
+        }
+    #endif
 }

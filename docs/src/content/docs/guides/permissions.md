@@ -70,15 +70,30 @@ Geolocation generally requires secure origins (`https`) in modern engines.
 
 ## File Selector
 
+`<input type="file">` works without a Dart callback:
+
+| Platform | Behavior |
+| --- | --- |
+| Android | Built-in Photo Picker for image/video, `ACTION_GET_CONTENT` for other MIME types, camera when `capture` is set. |
+| iOS | WKWebView system picker (PHPicker / document picker). |
+| macOS | `WKUIDelegate.runOpenPanel` presents `NSOpenPanel`. |
+| Windows / Linux / Web | Engine or browser dialog. Engine-owned; no common Dart callback. |
+
+Cancel, permission denial, and errors complete the native callback with `null` so the input can be used again.
+
+Android Photo Picker and SAF do **not** need `READ_MEDIA_*` or `READ_EXTERNAL_STORAGE`. Camera capture requests `CAMERA` at runtime. Declare `CAMERA` in the host `AndroidManifest.xml`. iOS pages that use `capture` or a photo library picker need `NSCameraUsageDescription` and usually `NSPhotoLibraryUsageDescription` in `Info.plist`. Missing usage strings can crash the app.
+
+Optional Android override:
+
 ```dart
 await (controller.platform as AndroidWebViewController)
     .setOnShowFileSelector((FileSelectorParams params) async {
   debugPrint('accept=${params.acceptTypes}');
-  return <String>['/path/to/file.png'];
+  return <String>['content://media/picker/0'];
 });
 ```
 
-`FileSelectorParams` includes:
+Return an empty list to cancel. `FileSelectorParams` includes:
 
 | Field | Meaning |
 | --- | --- |
@@ -86,6 +101,8 @@ await (controller.platform as AndroidWebViewController)
 | `acceptTypes` | MIME types accepted by the page. |
 | `filenameHint` | Suggested filename when the mode allows saving. |
 | `mode` | `open`, `openMultiple`, or `save`. |
+
+Add `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO` (API 33+) or `READ_EXTERNAL_STORAGE` (API 32 and below) only if this custom callback reads the MediaStore directly.
 
 ## Fullscreen Custom Widgets
 

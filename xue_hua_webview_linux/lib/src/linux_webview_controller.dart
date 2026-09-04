@@ -376,10 +376,7 @@ class LinuxWebViewController extends PlatformWebViewController
         );
         return JavaScriptAsyncResult(value: _decodeOptionalJsResult(result));
       } on MissingPluginException {
-        return runJavaScriptAsyncViaBridge(
-          functionBody,
-          arguments: arguments,
-        );
+        return runJavaScriptAsyncViaBridge(functionBody, arguments: arguments);
       } on PlatformException catch (error) {
         if (error.code == 'unsupported') {
           return runJavaScriptAsyncViaBridge(
@@ -387,9 +384,7 @@ class LinuxWebViewController extends PlatformWebViewController
             arguments: arguments,
           );
         }
-        return JavaScriptAsyncResult(
-          error: error.message ?? error.toString(),
-        );
+        return JavaScriptAsyncResult(error: error.message ?? error.toString());
       }
     }
 

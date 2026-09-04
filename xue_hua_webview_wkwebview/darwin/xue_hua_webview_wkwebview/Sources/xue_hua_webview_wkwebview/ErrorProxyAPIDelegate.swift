@@ -9,15 +9,15 @@ import Foundation
 /// This class may handle instantiating native object instances that are attached to a Dart instance
 /// or handle method calls on the associated native class or an instance of that class.
 class ErrorProxyAPIDelegate: PigeonApiDelegateNSError {
-  func code(pigeonApi: PigeonApiNSError, pigeonInstance: NSError) throws -> Int64 {
-    return Int64(pigeonInstance.code)
-  }
+    func code(pigeonApi _: PigeonApiNSError, pigeonInstance: NSError) throws -> Int64 {
+        return Int64(pigeonInstance.code)
+    }
 
-  func domain(pigeonApi: PigeonApiNSError, pigeonInstance: NSError) throws -> String {
-    return pigeonInstance.domain
-  }
+    func domain(pigeonApi _: PigeonApiNSError, pigeonInstance: NSError) throws -> String {
+        return pigeonInstance.domain
+    }
 
-  func userInfo(pigeonApi: PigeonApiNSError, pigeonInstance: NSError) throws -> [String: Any?] {
-    return pigeonInstance.userInfo
-  }
+    func userInfo(pigeonApi _: PigeonApiNSError, pigeonInstance: NSError) throws -> [String: Any?] {
+        return pigeonInstance.userInfo
+    }
 }

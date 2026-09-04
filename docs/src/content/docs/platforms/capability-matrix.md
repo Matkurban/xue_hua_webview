@@ -1,6 +1,6 @@
 ---
 title: Capability Matrix
-description: Cross-platform feature support for xue_hua_webview 1.0.1.
+description: Cross-platform feature support for xue_hua_webview 1.1.0.
 ---
 
 Legend:
@@ -41,6 +41,7 @@ Legend:
 | `onHttpError` | Full | Full | Full | Full | Full | Limited, fetch-backed loads expose response |
 | HTTP auth callback | Full | Full | Full | Full | Full | No browser iframe event |
 | Recoverable SSL auth callback | Full | Full | Full | Full | Full | No browser iframe event |
+| External app URL / custom scheme | Full | Full | Full | No | No | Browser-owned |
 
 ## JavaScript, UI, and Permissions
 
@@ -56,7 +57,7 @@ Legend:
 | `prompt` callback | Full | Full | Full | Full | Full | Same-origin synchronous callback; isolated uses browser dialog |
 | Permission request callback | Full | Full | Full | Full | Full | Controllable HTML media hook plus browser prompt |
 | WebAuthn/passkeys | Limited, explicit opt-in and app association | Limited, OS and Associated Domains | Limited, OS and Associated Domains | Limited, Runtime/OS/provider | No, WebKitGTK port | Limited, browser and iframe policy |
-| File selector callback | Full | No common callback | No common callback | No common callback | No common callback | Browser-owned |
+| File selector | Full, built-in plus optional callback | Engine-owned | Full, `NSOpenPanel` via WKUIDelegate | Engine-owned | Engine-owned | Browser-owned |
 | Geolocation prompt callback | Full | No platform API | No platform API | Browser/engine-owned | Browser/engine-owned | Browser-owned |
 | Fullscreen custom widget | Full | Engine-owned | Engine-owned | Engine-owned | Engine-owned | Browser-owned |
 
@@ -89,8 +90,8 @@ Legend:
 
 | Platform | Important extra APIs |
 | --- | --- |
-| Android | debugging, media gesture, text zoom, wide viewport, content/file access, geolocation, file selector, custom fullscreen widget, console, JavaScript dialogs, scrollbars, overscroll, mixed content, WebAuthn/passkeys, Payment Request, insets. |
-| iOS/macOS | inline media, media gesture policy, app-bound domains, JavaScript popup policy, back/forward gestures, link preview, inspectable, WebKit file read access, permission prompt forwarding. |
+| Android | debugging, media gesture, text zoom, wide viewport, content/file access, geolocation, built-in file selector plus optional callback, custom fullscreen widget, console, JavaScript dialogs, scrollbars, overscroll, mixed content, WebAuthn/passkeys, Payment Request, insets. |
+| iOS/macOS | inline media, media gesture policy, app-bound domains, JavaScript popup policy, back/forward gestures, link preview, inspectable, WebKit file read access, permission prompt forwarding, macOS file open panel. |
 | Windows | WebView2 environment, runtime version, popup policy, DevTools, suspend/resume, zoom factor, cache disabled, virtual host mapping, extended cookies. |
 | Linux | WebKitGTK developer extras, inspector, media settings, page cache, file URL access, font sizes, zoom factor, JavaScript dialogs, HTTP/SSL auth, permission requests. |
 | Web | iframe attributes, sandbox/referrer/permissions policy, fetch-backed requests, isolated managed-HTML bridge, media permission mediation. |

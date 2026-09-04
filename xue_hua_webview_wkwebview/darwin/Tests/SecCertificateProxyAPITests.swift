@@ -3,34 +3,34 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 #if os(iOS)
-  import Flutter
+    import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+    import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+    #error("Unsupported platform.")
 #endif
 
 class SecCertificateProxyAPITests: XCTestCase {
-  func testCopyData() {
-    let registrar = TestProxyApiRegistrar()
-    let delegate = TestSecCertificateProxyAPIDelegate()
-    let api = PigeonApiSecCertificate(pigeonRegistrar: registrar, delegate: delegate)
+    func testCopyData() {
+        let registrar = TestProxyApiRegistrar()
+        let delegate = TestSecCertificateProxyAPIDelegate()
+        let api = PigeonApiSecCertificate(pigeonRegistrar: registrar, delegate: delegate)
 
-    let value = try? api.pigeonDelegate.copyData(
-      pigeonApi: api, certificate: SecCertificateWrapper(value: createTestCertificate()))
+        let value = try? api.pigeonDelegate.copyData(
+            pigeonApi: api, certificate: SecCertificateWrapper(value: createTestCertificate())
+        )
 
-    XCTAssertEqual(value?.data, delegate.data)
-  }
+        XCTAssertEqual(value?.data, delegate.data)
+    }
 }
 
 class TestSecCertificateProxyAPIDelegate: SecCertificateProxyAPIDelegate {
-  let data = Data()
+    let data = Data()
 
-  override func secCertificateCopyData(_ certificate: SecCertificate) -> CFData {
-    return data as CFData
-  }
+    override func secCertificateCopyData(_: SecCertificate) -> CFData {
+        return data as CFData
+    }
 }

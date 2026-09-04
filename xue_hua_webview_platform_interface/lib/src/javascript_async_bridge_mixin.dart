@@ -114,8 +114,8 @@ mixin JavaScriptAsyncBridgeMixin on PlatformWebViewController {
     if (id is! String) {
       return;
     }
-    final Completer<JavaScriptAsyncResult>? completer =
-        _javaScriptAsyncPending.remove(id);
+    final Completer<JavaScriptAsyncResult>? completer = _javaScriptAsyncPending
+        .remove(id);
     if (completer == null || completer.isCompleted) {
       return;
     }

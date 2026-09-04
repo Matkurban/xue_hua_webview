@@ -26,12 +26,12 @@ class LinuxWebViewStorageManager extends PlatformWebViewStorageManager {
     },
     DateTime? since,
   }) {
-    return LinuxWebViewController.rootChannel.invokeMethod<void>(
-      'clearWebsiteData',
-      <String, Object?>{
-        'dataTypes': dataTypes.map((WebViewDataType type) => type.name).toList(),
-        if (since != null) 'sinceMilliseconds': since.millisecondsSinceEpoch,
-      },
-    );
+    return LinuxWebViewController.rootChannel
+        .invokeMethod<void>('clearWebsiteData', <String, Object?>{
+          'dataTypes': dataTypes
+              .map((WebViewDataType type) => type.name)
+              .toList(),
+          if (since != null) 'sinceMilliseconds': since.millisecondsSinceEpoch,
+        });
   }
 }

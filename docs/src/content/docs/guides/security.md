@@ -25,7 +25,10 @@ NavigationDelegate(
 );
 ```
 
-Use the app router for custom schemes such as `myapp://` and prevent the WebView from navigating to them.
+On Android, iOS, and macOS the WebView no longer loads custom schemes. They are
+opened with the system instead. Return `NavigationDecision.prevent` from
+`onNavigationRequest` when the host must not launch another app. Use the app
+router only when the scheme belongs to this process.
 
 ## JavaScript Channels
 

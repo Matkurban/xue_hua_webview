@@ -20,7 +20,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -79,34 +78,30 @@ public class WebChromeClientProxyApi extends PigeonApiWebChromeClient {
         @NonNull WebView webView,
         @NonNull ValueCallback<Uri[]> filePathCallback,
         @NonNull FileChooserParams fileChooserParams) {
-      final boolean currentReturnValueForOnShowFileChooser = returnValueForOnShowFileChooser;
-      api.onShowFileChooser(
-          this,
-          webView,
-          fileChooserParams,
-          ResultCompat.asCompatCallback(
-              reply -> {
-                if (reply.isFailure()) {
-                  api.getPigeonRegistrar()
-                      .logError(TAG, Objects.requireNonNull(reply.exceptionOrNull()));
-                  return null;
-                }
-
-                final List<String> value = Objects.requireNonNull(reply.getOrNull());
-
-                // The returned list of file paths can only be passed to `filePathCallback` if the
-                // `onShowFileChooser` method returned true.
-                if (currentReturnValueForOnShowFileChooser) {
-                  final Uri[] filePaths = new Uri[value.size()];
-                  for (int i = 0; i < value.size(); i++) {
-                    filePaths[i] = Uri.parse(value.get(i));
+      final FileChooserHelper helper = api.getPigeonRegistrar().getFileChooserHelper();
+      if (returnValueForOnShowFileChooser) {
+        helper.replacePendingCallback(filePathCallback);
+        api.onShowFileChooser(
+            this,
+            webView,
+            fileChooserParams,
+            ResultCompat.asCompatCallback(
+                reply -> {
+                  if (reply.isFailure()) {
+                    api.getPigeonRegistrar()
+                        .logError(TAG, Objects.requireNonNull(reply.exceptionOrNull()));
+                    helper.completeIfCurrent(filePathCallback, null);
+                    return null;
                   }
-                  filePathCallback.onReceiveValue(filePaths);
-                }
 
-                return null;
-              }));
-      return currentReturnValueForOnShowFileChooser;
+                  helper.completeFromDartStrings(filePathCallback, reply.getOrNull());
+                  return null;
+                }));
+        return true;
+      }
+
+      helper.start(filePathCallback, fileChooserParams);
+      return true;
     }
 
     @Override

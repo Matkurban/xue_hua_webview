@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,7 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -213,5 +215,50 @@ public class WebChromeClientTest {
 
     verify(mockApi)
         .onJsPrompt(eq(instance), eq(webView), eq(url), eq(message), eq(defaultValue), any());
+  }
+
+  @Test
+  public void onShowFileChooserDartOverrideFailureCompletesNull() {
+    final WebChromeClientProxyApi mockApi = mock(WebChromeClientProxyApi.class);
+    final TestProxyApiRegistrar registrar = new TestProxyApiRegistrar();
+    when(mockApi.getPigeonRegistrar()).thenReturn(registrar);
+    doAnswer(
+            invocation -> {
+              ResultCompat.failure(
+                  new RuntimeException("dart failed"), invocation.getArgument(3));
+              return null;
+            })
+        .when(mockApi)
+        .onShowFileChooser(any(), any(), any(), any());
+
+    final WebChromeClientImpl instance = new WebChromeClientImpl(mockApi);
+    instance.setReturnValueForOnShowFileChooser(true);
+    @SuppressWarnings("unchecked")
+    final ValueCallback<Uri[]> callback = mock(ValueCallback.class);
+    final WebChromeClient.FileChooserParams params = mock(WebChromeClient.FileChooserParams.class);
+    final android.webkit.WebView webView = mock(WebView.class);
+
+    assertTrue(instance.onShowFileChooser(webView, callback, params));
+    verify(mockApi).onShowFileChooser(eq(instance), eq(webView), eq(params), any());
+    verify(callback).onReceiveValue(null);
+  }
+
+  @Test
+  public void onShowFileChooserBuiltInWithoutActivityCompletesNull() {
+    final WebChromeClientProxyApi mockApi = mock(WebChromeClientProxyApi.class);
+    final TestProxyApiRegistrar registrar = new TestProxyApiRegistrar();
+    when(mockApi.getPigeonRegistrar()).thenReturn(registrar);
+
+    final WebChromeClientImpl instance = new WebChromeClientImpl(mockApi);
+    @SuppressWarnings("unchecked")
+    final ValueCallback<Uri[]> callback = mock(ValueCallback.class);
+    final WebChromeClient.FileChooserParams params = mock(WebChromeClient.FileChooserParams.class);
+    when(params.getAcceptTypes()).thenReturn(new String[] {"image/*"});
+    when(params.getMode()).thenReturn(WebChromeClient.FileChooserParams.MODE_OPEN);
+    when(params.isCaptureEnabled()).thenReturn(false);
+    final android.webkit.WebView webView = mock(WebView.class);
+
+    assertTrue(instance.onShowFileChooser(webView, callback, params));
+    verify(callback).onReceiveValue(null);
   }
 }

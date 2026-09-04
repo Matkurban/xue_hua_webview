@@ -38,6 +38,13 @@ onNavigationRequest: (NavigationRequest request) {
 }
 ```
 
+在 Android、iOS 和 macOS 上，页面跳转到自定义 scheme（`bilibili://`、
+`weixin://`、`intent://`、`mailto:`、`tel:` 等）会交给系统打开对应 App，而不是
+在 WebView 里加载。未设置 `onNavigationRequest` 时也会生效。回调仍会收到该
+URL：返回 `NavigationDecision.prevent` 可拦住拉起，返回 `navigate` 则打开 App。
+WebView 不会再加载这些地址，因此不会出现 `net::ERR_UNKNOWN_URL_SCHEME`。
+`javascript:` 不会外开。
+
 部分平台也会对 controller 主动发起的加载触发该回调，因此可以把它作为统一导航策略。
 
 Windows 会在请求交给 WebView2 前检查 controller 主动发起的加载，因此放行后仍会保留 method、headers 和 body。页面内容触发的主 frame 导航、redirect 和 `sameWindow` popup 会在等待异步决策时先取消，只在放行后重放；这种策略性取消不会误报为加载错误。

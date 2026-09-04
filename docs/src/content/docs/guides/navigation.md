@@ -42,6 +42,14 @@ onNavigationRequest: (NavigationRequest request) async {
 }
 ```
 
+On Android, iOS, and macOS, page navigations to custom schemes (`bilibili://`,
+`weixin://`, `intent://`, `mailto:`, `tel:`, and similar) are opened with the
+system app instead of being loaded in the WebView. That happens with no
+`onNavigationRequest` callback. The callback still receives the URL: return
+`NavigationDecision.prevent` to stop the handoff, or `navigate` to allow it.
+The WebView never loads these URLs, so they do not produce
+`net::ERR_UNKNOWN_URL_SCHEME`. `javascript:` is not handed to the OS.
+
 Some platforms also invoke the callback for controller-initiated loads. Treat it as a central policy hook.
 
 On Windows, controller-initiated requests are checked before WebView2 receives them, so an approved request keeps its method, headers, and body. Main-frame navigations initiated by page content, redirects, and `sameWindow` popups are canceled while an asynchronous decision is pending and replayed only when approved. These policy cancellations are not reported as load errors.

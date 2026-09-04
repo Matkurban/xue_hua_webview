@@ -26,6 +26,12 @@ class ResultCompat<T>(val result: Result<T>) {
     }
 
     @JvmStatic
+    fun <T> failure(exception: Throwable, callback: Any) {
+      val castedCallback: (Result<T>) -> Unit = callback as (Result<T>) -> Unit
+      castedCallback(Result.failure(exception))
+    }
+
+    @JvmStatic
     fun <T> asCompatCallback(result: (ResultCompat<T>) -> Unit): (Result<T>) -> Unit {
       return { result(ResultCompat(it)) }
     }

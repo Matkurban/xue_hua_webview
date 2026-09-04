@@ -9,108 +9,109 @@ import Foundation
 /// This class may handle instantiating native object instances that are attached to a Dart instance
 /// or handle method calls on the associated native class or an instance of that class.
 class HTTPCookieProxyAPIDelegate: PigeonApiDelegateHTTPCookie {
-  func pigeonDefaultConstructor(
-    pigeonApi: PigeonApiHTTPCookie, properties: [HttpCookiePropertyKey: Any]
-  ) throws -> HTTPCookie {
-    let registrar = pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar
+    func pigeonDefaultConstructor(
+        pigeonApi: PigeonApiHTTPCookie, properties: [HttpCookiePropertyKey: Any]
+    ) throws -> HTTPCookie {
+        let registrar = pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar
 
-    let keyValueTuples = try properties.map {
-      key, value in
+        let keyValueTuples = try properties.map {
+            key, value in
+            let newKey: HTTPCookiePropertyKey
+            switch key {
+            case .comment:
+                newKey = .comment
+            case .commentUrl:
+                newKey = .commentURL
+            case .discard:
+                newKey = .discard
+            case .domain:
+                newKey = .domain
+            case .expires:
+                newKey = .expires
+            case .maximumAge:
+                newKey = .maximumAge
+            case .name:
+                newKey = .name
+            case .originUrl:
+                newKey = .originURL
+            case .path:
+                newKey = .path
+            case .port:
+                newKey = .port
+            case .secure:
+                newKey = .secure
+            case .value:
+                newKey = .value
+            case .version:
+                newKey = .version
+            case .sameSitePolicy:
+                newKey = .sameSitePolicy
+            case .unknown:
+                throw registrar.createUnknownEnumError(
+                    withEnum: key
+                )
+            }
 
-      let newKey: HTTPCookiePropertyKey
-      switch key {
-      case .comment:
-        newKey = .comment
-      case .commentUrl:
-        newKey = .commentURL
-      case .discard:
-        newKey = .discard
-      case .domain:
-        newKey = .domain
-      case .expires:
-        newKey = .expires
-      case .maximumAge:
-        newKey = .maximumAge
-      case .name:
-        newKey = .name
-      case .originUrl:
-        newKey = .originURL
-      case .path:
-        newKey = .path
-      case .port:
-        newKey = .port
-      case .secure:
-        newKey = .secure
-      case .value:
-        newKey = .value
-      case .version:
-        newKey = .version
-      case .sameSitePolicy:
-        newKey = .sameSitePolicy
-      case .unknown:
-        throw registrar.createUnknownEnumError(
-          withEnum: key)
-      }
+            return (newKey, value)
+        }
 
-      return (newKey, value)
+        let nativeProperties = Dictionary(uniqueKeysWithValues: keyValueTuples)
+        let cookie = HTTPCookie(properties: nativeProperties)
+        if let cookie = cookie {
+            return cookie
+        } else {
+            throw registrar.createConstructorNullError(
+                type: HTTPCookie.self, parameters: ["properties": nativeProperties]
+            )
+        }
     }
 
-    let nativeProperties = Dictionary(uniqueKeysWithValues: keyValueTuples)
-    let cookie = HTTPCookie(properties: nativeProperties)
-    if let cookie = cookie {
-      return cookie
-    } else {
-      throw registrar.createConstructorNullError(
-        type: HTTPCookie.self, parameters: ["properties": nativeProperties])
+    func getProperties(pigeonApi _: PigeonApiHTTPCookie, pigeonInstance: HTTPCookie) throws
+        -> [HttpCookiePropertyKey: Any]?
+    {
+        if pigeonInstance.properties == nil {
+            return nil
+        }
+
+        let keyValueTuples = pigeonInstance.properties!.map { key, value in
+            let newKey: HttpCookiePropertyKey
+            switch key {
+            case .comment:
+                newKey = .comment
+            case .commentURL:
+                newKey = .commentUrl
+            case .discard:
+                newKey = .discard
+            case .domain:
+                newKey = .domain
+            case .expires:
+                newKey = .expires
+            case .maximumAge:
+                newKey = .maximumAge
+            case .name:
+                newKey = .name
+            case .originURL:
+                newKey = .originUrl
+            case .path:
+                newKey = .path
+            case .port:
+                newKey = .port
+            case .sameSitePolicy:
+                newKey = .sameSitePolicy
+            case .secure:
+                newKey = .secure
+            case .value:
+                newKey = .value
+            case .version:
+                newKey = .version
+            default:
+                newKey = .unknown
+            }
+
+            return (newKey, value)
+        }
+
+        // Use newest value in case of duplicates
+        return Dictionary(keyValueTuples, uniquingKeysWith: { _, last in last })
     }
-  }
-
-  func getProperties(pigeonApi: PigeonApiHTTPCookie, pigeonInstance: HTTPCookie) throws
-    -> [HttpCookiePropertyKey: Any]?
-  {
-    if pigeonInstance.properties == nil {
-      return nil
-    }
-
-    let keyValueTuples = pigeonInstance.properties!.map { key, value in
-      let newKey: HttpCookiePropertyKey
-      switch key {
-      case .comment:
-        newKey = .comment
-      case .commentURL:
-        newKey = .commentUrl
-      case .discard:
-        newKey = .discard
-      case .domain:
-        newKey = .domain
-      case .expires:
-        newKey = .expires
-      case .maximumAge:
-        newKey = .maximumAge
-      case .name:
-        newKey = .name
-      case .originURL:
-        newKey = .originUrl
-      case .path:
-        newKey = .path
-      case .port:
-        newKey = .port
-      case .sameSitePolicy:
-        newKey = .sameSitePolicy
-      case .secure:
-        newKey = .secure
-      case .value:
-        newKey = .value
-      case .version:
-        newKey = .version
-      default:
-        newKey = .unknown
-      }
-
-      return (newKey, value)
-    }
-
-    // Use newest value in case of duplicates
-    return Dictionary(keyValueTuples, uniquingKeysWith: { _, last in last })
-  }
 }

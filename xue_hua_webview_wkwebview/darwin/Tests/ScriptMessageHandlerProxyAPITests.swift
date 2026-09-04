@@ -4,39 +4,38 @@
 
 import WebKit
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class ScriptMessageHandlerProxyAPITests: XCTestCase {
-  func testPigeonDefaultConstructor() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKScriptMessageHandler(registrar)
+    func testPigeonDefaultConstructor() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKScriptMessageHandler(registrar)
 
-    let instance = try? api.pigeonDelegate.pigeonDefaultConstructor(pigeonApi: api)
-    XCTAssertNotNil(instance)
-  }
+        let instance = try? api.pigeonDelegate.pigeonDefaultConstructor(pigeonApi: api)
+        XCTAssertNotNil(instance)
+    }
 
-  @MainActor func testDidReceiveScriptMessage() {
-    let api = TestScriptMessageHandlerApi()
-    let registrar = TestProxyApiRegistrar()
-    let instance = ScriptMessageHandlerImpl(api: api, registrar: registrar)
-    let controller = WKUserContentController()
-    let message = WKScriptMessage()
+    @MainActor func testDidReceiveScriptMessage() {
+        let api = TestScriptMessageHandlerApi()
+        let registrar = TestProxyApiRegistrar()
+        let instance = ScriptMessageHandlerImpl(api: api, registrar: registrar)
+        let controller = WKUserContentController()
+        let message = WKScriptMessage()
 
-    instance.userContentController(controller, didReceive: message)
+        instance.userContentController(controller, didReceive: message)
 
-    XCTAssertEqual(api.didReceiveScriptMessageArgs, [controller, message])
-  }
+        XCTAssertEqual(api.didReceiveScriptMessageArgs, [controller, message])
+    }
 }
 
 class TestScriptMessageHandlerApi: PigeonApiProtocolWKScriptMessageHandler {
-  var didReceiveScriptMessageArgs: [AnyHashable?]? = nil
+    var didReceiveScriptMessageArgs: [AnyHashable?]?
 
-  func didReceiveScriptMessage(
-    pigeonInstance pigeonInstanceArg: WKScriptMessageHandler,
-    controller controllerArg: WKUserContentController, message messageArg: WKScriptMessage,
-    completion: @escaping (Result<Void, PigeonError>) -> Void
-  ) {
-    didReceiveScriptMessageArgs = [controllerArg, messageArg]
-  }
+    func didReceiveScriptMessage(
+        pigeonInstance _: WKScriptMessageHandler,
+        controller controllerArg: WKUserContentController, message messageArg: WKScriptMessage,
+        completion _: @escaping (Result<Void, PigeonError>) -> Void
+    ) {
+        didReceiveScriptMessageArgs = [controllerArg, messageArg]
+    }
 }

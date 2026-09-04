@@ -64,9 +64,7 @@ abstract class PlatformHeadlessWebView extends PlatformInterface {
 
   /// Starts the native WebView so it can load content without a widget.
   Future<void> run() {
-    throw UnimplementedError(
-      'run is not implemented on the current platform',
-    );
+    throw UnimplementedError('run is not implemented on the current platform');
   }
 
   /// Releases native resources owned by this headless WebView.

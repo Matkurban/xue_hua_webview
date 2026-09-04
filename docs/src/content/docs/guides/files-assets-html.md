@@ -3,6 +3,25 @@ title: Files, Assets, HTML
 description: Load local files, Flutter assets, inline HTML, and custom requests safely.
 ---
 
+## HTML file inputs
+
+`<input type="file">` is a page-initiated picker, not `loadFile`. Android uses
+the built-in Photo Picker / content chooser / camera path. iOS uses WKWebView's
+system picker. macOS uses `NSOpenPanel`. Windows, Linux, and Web use the engine
+or browser dialog. See [Permissions](/xue_hua_webview/guides/permissions/) for
+host-app manifest and Info.plist keys.
+
+Manual checks after a page load:
+
+- `<input type="file" accept="image/*" multiple>` opens the Photo Picker or
+  system picker, allows more than one image, and canceling lets you tap the
+  control again.
+- `<input type="file">` without `accept` can pick an arbitrary file such as a
+  PDF.
+- `<input type="file" accept="image/*" capture>` asks for camera permission
+  and then opens the camera. Denying permission or backing out of the camera
+  must not freeze the input.
+
 ## Local Files
 
 ```dart

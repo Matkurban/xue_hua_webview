@@ -23,8 +23,9 @@ class AndroidWebViewStorageManagerCreationParams
 /// Clears Android WebView cookies, HTTP cache, and JavaScript storage.
 class AndroidWebViewStorageManager extends PlatformWebViewStorageManager {
   /// Constructs a [AndroidWebViewStorageManager].
-  AndroidWebViewStorageManager(PlatformWebViewStorageManagerCreationParams params)
-    : super.implementation(
+  AndroidWebViewStorageManager(
+    PlatformWebViewStorageManagerCreationParams params,
+  ) : super.implementation(
         params is AndroidWebViewStorageManagerCreationParams
             ? params
             : const AndroidWebViewStorageManagerCreationParams(),

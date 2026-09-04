@@ -1415,7 +1415,10 @@ void main() {
 
     await controller.setOverScrollMode(WebViewOverScrollMode.never);
     expect(addedScripts, hasLength(1));
-    expect(addedScripts.single, contains('__flutter_xue_hua_webview_overscroll'));
+    expect(
+      addedScripts.single,
+      contains('__flutter_xue_hua_webview_overscroll'),
+    );
     expect(addedScripts.single, contains('const value = "none"'));
     expect(executedScripts.single, addedScripts.single);
 

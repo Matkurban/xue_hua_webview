@@ -23,8 +23,9 @@ class WebKitWebViewStorageManagerCreationParams
 /// Clears WKWebsiteDataStore data without a live WebView.
 class WebKitWebViewStorageManager extends PlatformWebViewStorageManager {
   /// Constructs a [WebKitWebViewStorageManager].
-  WebKitWebViewStorageManager(PlatformWebViewStorageManagerCreationParams params)
-    : super.implementation(
+  WebKitWebViewStorageManager(
+    PlatformWebViewStorageManagerCreationParams params,
+  ) : super.implementation(
         params is WebKitWebViewStorageManagerCreationParams
             ? params
             : const WebKitWebViewStorageManagerCreationParams(),
@@ -39,8 +40,9 @@ class WebKitWebViewStorageManager extends PlatformWebViewStorageManager {
     },
     DateTime? since,
   }) {
-    final double modificationTime = (since ?? DateTime.fromMillisecondsSinceEpoch(0))
-        .millisecondsSinceEpoch /
+    final double modificationTime =
+        (since ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .millisecondsSinceEpoch /
         1000;
     return _dataStore.removeDataOfTypes(
       _toWebsiteDataTypes(dataTypes),

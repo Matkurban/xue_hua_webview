@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:xue_hua_webview_platform_interface/xue_hua_webview_platform_interface.dart';
 
+import 'android_external_url.dart';
 import 'android_ssl_auth_error.dart';
 import 'android_webkit.g.dart' as android_webview;
 import 'android_webkit_constants.dart';
@@ -860,6 +861,16 @@ class AndroidWebViewController extends PlatformWebViewController
 
   /// Sets the callback that is invoked when the client should show a file
   /// selector.
+  ///
+  /// When this is `null` (the default), Android uses the plugin's built-in
+  /// picker: Photo Picker for image and video accept types,
+  /// `ACTION_GET_CONTENT` for other MIME types, and the camera when
+  /// [FileSelectorParams.isCaptureEnabled] is true. Cancel, permission
+  /// denial, and errors complete the WebView callback with `null` so the file
+  /// input can be used again.
+  ///
+  /// When non-null, the callback must return file URI strings (for example
+  /// `content://...`). Return an empty list to cancel.
   Future<void> setOnShowFileSelector(
     Future<List<String>> Function(FileSelectorParams params)?
     onShowFileSelector,
@@ -1695,14 +1706,17 @@ class AndroidUrlChange extends UrlChange {
 /// triggered by the [android_webview.WebView].
 class AndroidNavigationDelegate extends PlatformNavigationDelegate {
   /// Creates a new [AndroidNavigationDelegate].
-  AndroidNavigationDelegate(PlatformNavigationDelegateCreationParams params)
-    : super.implementation(
-        params is AndroidNavigationDelegateCreationParams
-            ? params
-            : AndroidNavigationDelegateCreationParams.fromPlatformNavigationDelegateCreationParams(
-                params,
-              ),
-      ) {
+  AndroidNavigationDelegate(
+    PlatformNavigationDelegateCreationParams params, {
+    @visibleForTesting Future<String?> Function(String url)? openExternalUrl,
+  }) : _externalUrlClient = ExternalUrlClient(openUrl: openExternalUrl),
+       super.implementation(
+         params is AndroidNavigationDelegateCreationParams
+             ? params
+             : AndroidNavigationDelegateCreationParams.fromPlatformNavigationDelegateCreationParams(
+                 params,
+               ),
+       ) {
     final weakThis = WeakReference<AndroidNavigationDelegate>(this);
 
     _webViewClient = android_webview.WebViewClient(
@@ -1902,6 +1916,8 @@ class AndroidNavigationDelegate extends PlatformNavigationDelegate {
   android_webview.WebChromeClient get androidWebChromeClient =>
       _webChromeClient;
 
+  final ExternalUrlClient _externalUrlClient;
+
   late final android_webview.WebViewClient _webViewClient;
 
   /// Gets the native [android_webview.WebViewClient] that is bridged by this [AndroidNavigationDelegate].
@@ -1946,12 +1962,14 @@ class AndroidNavigationDelegate extends PlatformNavigationDelegate {
   }) {
     final LoadRequestCallback? onLoadRequest = _onLoadRequest;
     final NavigationRequestCallback? onNavigationRequest = _onNavigationRequest;
+    final bool external = isExternalUrl(url);
 
-    // The client is only allowed to stop navigations that target the main frame because
-    // overridden URLs are passed to `loadUrl` and `loadUrl` cannot load a subframe.
-    if (!isForMainFrame ||
-        onNavigationRequest == null ||
-        onLoadRequest == null) {
+    // HTTPS subframe loads cannot be replayed with `loadUrl`. External schemes
+    // are still reported so `prevent` can block an in-iframe app open.
+    if (onNavigationRequest == null) {
+      return;
+    }
+    if (!external && (!isForMainFrame || onLoadRequest == null)) {
       return;
     }
 
@@ -1966,14 +1984,29 @@ class AndroidNavigationDelegate extends PlatformNavigationDelegate {
     }
 
     void handleDecision(NavigationDecision decision) {
-      if (decision == NavigationDecision.navigate) {
-        _runAndroidAsyncCallbackSafely(
-          'approved navigation load',
-          () => onLoadRequest(
-            LoadRequestParams(uri: Uri.parse(url), headers: headers),
-          ),
-        );
+      if (decision != NavigationDecision.navigate) {
+        return;
       }
+      if (external) {
+        _runAndroidAsyncCallbackSafely('approved external url', () async {
+          final String? fallback = await _externalUrlClient.open(url);
+          if (fallback != null &&
+              fallback.isNotEmpty &&
+              !isExternalUrl(fallback) &&
+              onLoadRequest != null) {
+            await onLoadRequest(
+              LoadRequestParams(uri: Uri.parse(fallback), headers: headers),
+            );
+          }
+        });
+        return;
+      }
+      _runAndroidAsyncCallbackSafely(
+        'approved navigation load',
+        () => onLoadRequest!(
+          LoadRequestParams(uri: Uri.parse(url), headers: headers),
+        ),
+      );
     }
 
     if (returnValue is NavigationDecision) {

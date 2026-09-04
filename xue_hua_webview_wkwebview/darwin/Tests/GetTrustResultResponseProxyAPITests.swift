@@ -3,27 +3,26 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class GetTrustResultResponseProxyAPITests: XCTestCase {
-  func testResult() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiGetTrustResultResponse(registrar)
+    func testResult() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiGetTrustResultResponse(registrar)
 
-    let instance = GetTrustResultResponse(result: SecTrustResultType.invalid, resultCode: -1)
-    let value = try? api.pigeonDelegate.result(pigeonApi: api, pigeonInstance: instance)
+        let instance = GetTrustResultResponse(result: SecTrustResultType.invalid, resultCode: -1)
+        let value = try? api.pigeonDelegate.result(pigeonApi: api, pigeonInstance: instance)
 
-    XCTAssertEqual(value, DartSecTrustResultType.invalid)
-  }
+        XCTAssertEqual(value, DartSecTrustResultType.invalid)
+    }
 
-  func testResultCode() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiGetTrustResultResponse(registrar)
+    func testResultCode() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiGetTrustResultResponse(registrar)
 
-    let instance = GetTrustResultResponse(result: SecTrustResultType.invalid, resultCode: -1)
-    let value = try? api.pigeonDelegate.resultCode(pigeonApi: api, pigeonInstance: instance)
+        let instance = GetTrustResultResponse(result: SecTrustResultType.invalid, resultCode: -1)
+        let value = try? api.pigeonDelegate.resultCode(pigeonApi: api, pigeonInstance: instance)
 
-    XCTAssertEqual(value, -1)
-  }
+        XCTAssertEqual(value, -1)
+    }
 }

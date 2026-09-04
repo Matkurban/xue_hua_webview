@@ -6,27 +6,27 @@ import WebKit
 
 /// Implementation of `WKScriptMessageHandler` that calls to Dart in callback methods.
 class ScriptMessageHandlerImpl: NSObject, WKScriptMessageHandler {
-  let api: PigeonApiProtocolWKScriptMessageHandler
-  unowned let registrar: ProxyAPIRegistrar
+    let api: PigeonApiProtocolWKScriptMessageHandler
+    unowned let registrar: ProxyAPIRegistrar
 
-  init(api: PigeonApiProtocolWKScriptMessageHandler, registrar: ProxyAPIRegistrar) {
-    self.api = api
-    self.registrar = registrar
-  }
-
-  func userContentController(
-    _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
-  ) {
-    registrar.dispatchOnMainThread { onFailure in
-      self.api.didReceiveScriptMessage(
-        pigeonInstance: self, controller: userContentController, message: message
-      ) { result in
-        if case .failure(let error) = result {
-          onFailure("WKScriptMessageHandler.didReceiveScriptMessage", error)
-        }
-      }
+    init(api: PigeonApiProtocolWKScriptMessageHandler, registrar: ProxyAPIRegistrar) {
+        self.api = api
+        self.registrar = registrar
     }
-  }
+
+    func userContentController(
+        _ userContentController: WKUserContentController, didReceive message: WKScriptMessage
+    ) {
+        registrar.dispatchOnMainThread { onFailure in
+            self.api.didReceiveScriptMessage(
+                pigeonInstance: self, controller: userContentController, message: message
+            ) { result in
+                if case let .failure(error) = result {
+                    onFailure("WKScriptMessageHandler.didReceiveScriptMessage", error)
+                }
+            }
+        }
+    }
 }
 
 /// ProxyApi implementation for `WKScriptMessageHandler`.
@@ -34,10 +34,11 @@ class ScriptMessageHandlerImpl: NSObject, WKScriptMessageHandler {
 /// This class may handle instantiating native object instances that are attached to a Dart instance
 /// or handle method calls on the associated native class or an instance of that class.
 class ScriptMessageHandlerProxyAPIDelegate: PigeonApiDelegateWKScriptMessageHandler {
-  func pigeonDefaultConstructor(pigeonApi: PigeonApiWKScriptMessageHandler) throws
-    -> WKScriptMessageHandler
-  {
-    return ScriptMessageHandlerImpl(
-      api: pigeonApi, registrar: pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar)
-  }
+    func pigeonDefaultConstructor(pigeonApi: PigeonApiWKScriptMessageHandler) throws
+        -> WKScriptMessageHandler
+    {
+        return ScriptMessageHandlerImpl(
+            api: pigeonApi, registrar: pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar
+        )
+    }
 }

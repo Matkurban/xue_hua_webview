@@ -148,7 +148,7 @@ injected CSS.
 | --- | --- |
 | `setBackgroundColor(Color color)` | Applies an engine background color where available. macOS uses a native API on 12+ and logs/no-ops on earlier versions. |
 | `enableZoom(bool enabled)` | Toggles platform zoom behavior. macOS uses native magnification. |
-| `setUserAgent(String? userAgent)` | Overrides the user agent where the engine allows it. Web logs once and ignores non-null overrides. |
+| `setUserAgent(String? userAgent)` | Overrides the user agent where the engine allows it. Web logs once and ignores non-null overrides. macOS already appends a Safari-compatible suffix when this is unset. |
 | `getUserAgent()` | Returns the effective or platform-reported user agent when available. |
 | `setOverScrollMode(WebViewOverScrollMode mode)` | Maps to native overscroll where possible or CSS `overscroll-behavior` on CSS-backed implementations. macOS logs/no-ops because no public API is available. |
 

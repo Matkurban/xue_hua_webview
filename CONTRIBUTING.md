@@ -33,3 +33,9 @@ cd docs
 pnpm install
 pnpm dev
 ```
+
+If you move or rename the checkout, run `flutter clean` in
+`xue_hua_webview/example` before the next macOS build. Xcode may still print
+`Stale file ... is located outside of the allowed root paths` from Flutter's
+`example/build/macos` output list; ignore it when the build ends with
+`Built .../example.app`.

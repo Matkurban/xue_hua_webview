@@ -7,7 +7,7 @@ description: 添加 xue_hua_webview，并在需要时显式依赖平台包。
 
 ```yaml
 dependencies:
-  xue_hua_webview: ^1.0.0
+  xue_hua_webview: ^1.1.0
 ```
 
 执行：
@@ -24,12 +24,12 @@ flutter pub get
 
 ```yaml
 dependencies:
-  xue_hua_webview: ^1.0.0
+  xue_hua_webview: ^1.1.0
   xue_hua_webview_windows: ^1.0.0
   xue_hua_webview_linux: ^1.0.0
   xue_hua_webview_web: ^1.0.0
-  xue_hua_webview_android: ^1.0.0
-  xue_hua_webview_wkwebview: ^1.0.0
+  xue_hua_webview_android: ^1.1.0
+  xue_hua_webview_wkwebview: ^1.1.0
 ```
 
 然后按需导入：

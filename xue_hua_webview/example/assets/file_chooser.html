@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文件选择测试</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f1ea;
+      --card: #fffdf8;
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --accent: #0f766e;
+      --accent-ink: #ecfdf5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1917;
+        --card: #292524;
+        --ink: #fafaf9;
+        --muted: #a8a29e;
+        --line: #44403c;
+        --accent: #2dd4bf;
+        --accent-ink: #042f2e;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .card h2 {
+      font-size: 1rem;
+      margin: 0 0 6px;
+    }
+    .card .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    label.btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    input[type="file"] { display: none; }
+    .result {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .preview img, .preview video {
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: 8px;
+      background: var(--line);
+    }
+  </style>
+</head>
+<body>
+  <h1>本地 HTML 文件选择</h1>
+  <p>用来手测各平台的 <code>&lt;input type="file"&gt;</code>。取消或拒绝权限后应还能再次点开。</p>
+
+  <section class="card">
+    <h2>任意文件</h2>
+    <p class="hint">无 accept，可选 PDF 或其他类型。</p>
+    <label class="btn">选择文件
+      <input id="any" type="file">
+    </label>
+    <div class="result" id="any-out">未选择</div>
+  </section>
+
+  <section class="card">
+    <h2>多选图片</h2>
+    <p class="hint">accept="image/*" multiple。Android 应走 Photo Picker。</p>
+    <label class="btn">选择图片
+      <input id="images" type="file" accept="image/*" multiple>
+    </label>
+    <div class="result" id="images-out">未选择</div>
+    <div class="preview" id="images-preview"></div>
+  </section>
+
+  <section class="card">
+    <h2>拍照</h2>
+    <p class="hint">accept="image/*" capture。需要相机权限。</p>
+    <label class="btn">打开相机
+      <input id="capture-image" type="file" accept="image/*" capture="environment">
+    </label>
+    <div class="result" id="capture-image-out">未选择</div>
+    <div class="preview" id="capture-image-preview"></div>
+  </section>
+
+  <section class="card">
+    <h2>视频</h2>
+    <p class="hint">accept="video/*"。</p>
+    <label class="btn">选择视频
+      <input id="video" type="file" accept="video/*">
+    </label>
+    <div class="result" id="video-out">未选择</div>
+    <div class="preview" id="video-preview"></div>
+  </section>
+
+  <section class="card">
+    <h2>摄像</h2>
+    <p class="hint">accept="video/*" capture。需要相机权限。</p>
+    <label class="btn">打开摄像机
+      <input id="capture-video" type="file" accept="video/*" capture="environment">
+    </label>
+    <div class="result" id="capture-video-out">未选择</div>
+    <div class="preview" id="capture-video-preview"></div>
+  </section>
+
+  <section class="card">
+    <h2>图片或视频</h2>
+    <p class="hint">accept="image/*,video/*" multiple。Android 应走 Photo Picker。</p>
+    <label class="btn">选择媒体
+      <input id="media" type="file" accept="image/*,video/*" multiple>
+    </label>
+    <div class="result" id="media-out">未选择</div>
+    <div class="preview" id="media-preview"></div>
+  </section>
+
+  <script>
+    function describeFiles(files) {
+      if (!files || files.length === 0) return '已取消或未选择';
+      return Array.from(files).map(function (file) {
+        return file.name + ' · ' + file.type + ' · ' + file.size + ' bytes';
+      }).join('\n');
+    }
+
+    function renderPreview(files, previewEl) {
+      previewEl.replaceChildren();
+      if (!files) return;
+      Array.from(files).forEach(function (file) {
+        var url = URL.createObjectURL(file);
+        var node;
+        if (file.type.indexOf('video/') === 0) {
+          node = document.createElement('video');
+          node.controls = true;
+          node.src = url;
+        } else if (file.type.indexOf('image/') === 0) {
+          node = document.createElement('img');
+          node.alt = file.name;
+          node.src = url;
+        } else {
+          return;
+        }
+        previewEl.appendChild(node);
+      });
+    }
+
+    function bind(id) {
+      var input = document.getElementById(id);
+      var out = document.getElementById(id + '-out');
+      var preview = document.getElementById(id + '-preview');
+      input.addEventListener('change', function () {
+        out.textContent = describeFiles(input.files);
+        if (preview) renderPreview(input.files, preview);
+      });
+    }
+
+    ['any', 'images', 'capture-image', 'video', 'capture-video', 'media'].forEach(bind);
+  </script>
+</body>
+</html>

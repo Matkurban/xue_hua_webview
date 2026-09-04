@@ -16,9 +16,11 @@ Set the minimum SDK to at least API 24. Add platform permissions when web conten
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
+`CAMERA` is required for `<input type="file" capture>` and `getUserMedia` camera. The plugin already declares it as optional hardware. Photo Picker and `ACTION_GET_CONTENT` do not need `READ_MEDIA_*` or `READ_EXTERNAL_STORAGE`. Add those storage permissions only if you implement a custom `setOnShowFileSelector` that reads the MediaStore.
+
 If your WebView needs Material-styled input controls, use a Material Components compatible Android theme in the app module.
 
-For file chooser or media capture flows, implement `AndroidWebViewController.setOnShowFileSelector` and grant runtime Android permissions in the app before calling `request.grant()`.
+File inputs work with the built-in Android picker. `AndroidWebViewController.setOnShowFileSelector` is an optional override. Grant runtime Android permissions in the app before calling `request.grant()` for WebView camera or microphone requests.
 
 ## iOS
 
@@ -29,9 +31,13 @@ Set the deployment target to iOS 13.0 or newer. Add `Info.plist` keys for any re
 <string>This app allows pages to use the camera after you approve the request.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>This app allows pages to use the microphone after you approve the request.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>This app allows pages to pick photos or videos after you approve the request.</string>
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>This app allows pages to request your current location.</string>
 ```
+
+`<input type="file">` uses WKWebView's system picker. Missing `NSCameraUsageDescription` can crash `capture` flows.
 
 HTTPS pages load without extra App Transport Security (ATS) exceptions. Cleartext HTTP is blocked by ATS unless the host app adds an exception in `Info.plist` (for example `NSExceptionDomains` for a specific host). Do not enable `NSAllowsArbitraryLoads` unless you accept the security trade-off.
 
@@ -44,7 +50,11 @@ Set the deployment target to macOS 10.15 or newer. For network access in a sandb
 ```xml
 <key>com.apple.security.network.client</key>
 <true/>
+<key>com.apple.security.files.user-selected.read-only</key>
+<true/>
 ```
+
+File inputs use `NSOpenPanel` through `WKUIDelegate.runOpenPanel`. The user-selected files entitlement is required in a sandboxed app.
 
 macOS uses the same `xue_hua_webview_wkwebview` package as iOS, but not every UIKit-backed WebKit property has a macOS equivalent. See [iOS and macOS](/xue_hua_webview/platforms/ios-macos/) for the exact limits.
 

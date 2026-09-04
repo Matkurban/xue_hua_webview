@@ -3,6 +3,21 @@ title: 文件、Asset 和 HTML
 description: 安全加载本地文件、Flutter asset、内联 HTML 和自定义请求。
 ---
 
+## HTML 文件输入
+
+`<input type="file">` 是页面发起的选择器，不是 `loadFile`。Android 使用内置
+Photo Picker / 内容选择器 / 相机；iOS 使用 WKWebView 系统选择器；macOS 使用
+`NSOpenPanel`；Windows、Linux 和 Web 使用引擎或浏览器对话框。宿主权限声明见
+[权限](/xue_hua_webview/zh/guides/permissions/)。
+
+页面加载后建议手工确认：
+
+- `<input type="file" accept="image/*" multiple>` 能打开 Photo Picker 或系统
+  选择器，支持多选，取消后再点一次输入框仍可用。
+- 不带 `accept` 的 `<input type="file">` 能选任意文件（例如 PDF）。
+- `<input type="file" accept="image/*" capture>` 会申请相机权限并打开相机。
+  拒绝权限或从相机返回后，输入框不能假死。
+
 ## 本地文件
 
 ```dart

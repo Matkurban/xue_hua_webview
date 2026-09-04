@@ -9,9 +9,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Message;
 import android.webkit.ClientCertRequest;
@@ -59,7 +63,7 @@ public class WebViewClientTest {
 
     final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
     final android.webkit.WebView webView = mock(WebView.class);
-    final android.webkit.WebResourceRequest request = mock(WebResourceRequest.class);
+    final android.webkit.WebResourceRequest request = httpsRequest(true);
     instance.shouldOverrideUrlLoading(webView, request);
 
     verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
@@ -73,8 +77,7 @@ public class WebViewClientTest {
     final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
     instance.setReturnValueForShouldOverrideUrlLoading(false);
     final android.webkit.WebView webView = mock(WebView.class);
-    final android.webkit.WebResourceRequest request = mock(WebResourceRequest.class);
-    when(request.isForMainFrame()).thenReturn(true);
+    final android.webkit.WebResourceRequest request = httpsRequest(true);
     instance.shouldOverrideUrlLoading(webView, request);
 
     verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
@@ -88,8 +91,7 @@ public class WebViewClientTest {
     final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
     instance.setReturnValueForShouldOverrideUrlLoading(true);
     final android.webkit.WebView webView = mock(WebView.class);
-    final android.webkit.WebResourceRequest request = mock(WebResourceRequest.class);
-    when(request.isForMainFrame()).thenReturn(true);
+    final android.webkit.WebResourceRequest request = httpsRequest(true);
 
     assertTrue(instance.shouldOverrideUrlLoading(webView, request));
     verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
@@ -102,8 +104,7 @@ public class WebViewClientTest {
 
     final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
     final android.webkit.WebView webView = mock(WebView.class);
-    final android.webkit.WebResourceRequest request = mock(WebResourceRequest.class);
-    when(request.isForMainFrame()).thenReturn(false);
+    final android.webkit.WebResourceRequest request = httpsRequest(false);
     instance.shouldOverrideUrlLoading(webView, request);
 
     verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
@@ -116,11 +117,54 @@ public class WebViewClientTest {
 
     final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
     final android.webkit.WebView webView = mock(WebView.class);
-    final android.webkit.WebResourceRequest request = mock(WebResourceRequest.class);
-    when(request.isForMainFrame()).thenReturn(false);
+    final android.webkit.WebResourceRequest request = httpsRequest(false);
 
     assertFalse(instance.shouldOverrideUrlLoading(webView, request));
     verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
+  }
+
+  @Test
+  public void urlLoadingExternalSchemeReturnsTrue() {
+    final WebViewClientProxyApi mockApi = mock(WebViewClientProxyApi.class);
+    when(mockApi.getPigeonRegistrar()).thenReturn(new TestProxyApiRegistrar());
+
+    final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
+    instance.setReturnValueForShouldOverrideUrlLoading(true);
+    final android.webkit.WebView webView = mock(WebView.class);
+    final android.webkit.WebResourceRequest request = requestWithUrl("bilibili://root", true);
+
+    assertTrue(instance.shouldOverrideUrlLoading(webView, request));
+    verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
+    verify(webView, never()).loadUrl(any());
+  }
+
+  @Test
+  public void urlLoadingExternalSchemeWithoutOverrideOpens() {
+    final WebViewClientProxyApi mockApi = mock(WebViewClientProxyApi.class);
+    when(mockApi.getPigeonRegistrar()).thenReturn(new TestProxyApiRegistrar());
+
+    final WebViewClientImpl instance = new WebViewClientImpl(mockApi);
+    instance.setReturnValueForShouldOverrideUrlLoading(false);
+    final android.webkit.WebView webView = mock(WebView.class);
+    final Context context = mock(Context.class);
+    when(webView.getContext()).thenReturn(context);
+    final android.webkit.WebResourceRequest request = requestWithUrl("bilibili://root", false);
+
+    assertTrue(instance.shouldOverrideUrlLoading(webView, request));
+    verify(mockApi).requestLoading(eq(instance), eq(webView), eq(request), any());
+    verify(context).startActivity(any(Intent.class));
+    verify(webView, never()).loadUrl(any());
+  }
+
+  private static WebResourceRequest httpsRequest(boolean mainFrame) {
+    return requestWithUrl("https://www.google.com", mainFrame);
+  }
+
+  private static WebResourceRequest requestWithUrl(String url, boolean mainFrame) {
+    final WebResourceRequest request = mock(WebResourceRequest.class);
+    when(request.getUrl()).thenReturn(Uri.parse(url));
+    when(request.isForMainFrame()).thenReturn(mainFrame);
+    return request;
   }
 
   @Test

@@ -21,7 +21,9 @@ NavigationDelegate(
 );
 ```
 
-对 `myapp://` 这类自定义 scheme，应交给应用路由处理并阻止 WebView 继续导航。
+在 Android、iOS 和 macOS 上，WebView 不再加载自定义 scheme，而是交给系统打开。
+若宿主不能拉起其他 App，在 `onNavigationRequest` 里返回
+`NavigationDecision.prevent`。只有该 scheme 属于本进程时，才交给应用路由。
 
 ## JavaScript Channel
 

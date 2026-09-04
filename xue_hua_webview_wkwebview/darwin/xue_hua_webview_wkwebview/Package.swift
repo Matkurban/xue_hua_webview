@@ -7,22 +7,22 @@
 import PackageDescription
 
 let package = Package(
-  name: "xue_hua_webview_wkwebview",
-  platforms: [
-    .iOS("13.0"),
-    .macOS("10.15"),
-  ],
-  products: [
-    .library(name: "xue-hua-webview-wkwebview", targets: ["xue_hua_webview_wkwebview"])
-  ],
-  dependencies: [],
-  targets: [
-    .target(
-      name: "xue_hua_webview_wkwebview",
-      dependencies: [],
-      resources: [
-        .process("Resources")
-      ]
-    )
-  ]
+    name: "xue_hua_webview_wkwebview",
+    platforms: [
+        .iOS("13.0"),
+        .macOS("10.15"),
+    ],
+    products: [
+        .library(name: "xue-hua-webview-wkwebview", targets: ["xue_hua_webview_wkwebview"]),
+    ],
+    dependencies: [],
+    targets: [
+        .target(
+            name: "xue_hua_webview_wkwebview",
+            dependencies: [],
+            resources: [
+                .process("Resources"),
+            ]
+        ),
+    ]
 )

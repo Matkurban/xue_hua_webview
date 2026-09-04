@@ -10,11 +10,11 @@ import Security
 /// by default. This wrapper is used to make the class compatible with generated pigeon
 /// code. All instances of `SecTrust`should be replaced with this.
 class SecTrustWrapper {
-  let value: SecTrust
+    let value: SecTrust
 
-  init(value: SecTrust) {
-    self.value = value
-  }
+    init(value: SecTrust) {
+        self.value = value
+    }
 }
 
 /// Wrapper for `SecCertificate`.
@@ -23,9 +23,9 @@ class SecTrustWrapper {
 /// by default. This wrapper is used to make the class compatible with generated pigeon
 /// code. All instances of `SecCertificate`should be replaced with this.
 class SecCertificateWrapper {
-  let value: SecCertificate
+    let value: SecCertificate
 
-  init(value: SecCertificate) {
-    self.value = value
-  }
+    init(value: SecCertificate) {
+        self.value = value
+    }
 }

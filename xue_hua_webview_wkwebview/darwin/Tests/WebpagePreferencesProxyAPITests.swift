@@ -4,20 +4,20 @@
 
 import WebKit
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class WebpagePreferencesProxyAPITests: XCTestCase {
-  @available(iOS 14.0, macOS 11.0, *)
-  @MainActor func testSetAllowsContentJavaScript() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKWebpagePreferences(registrar)
+    @available(iOS 14.0, macOS 11.0, *)
+    @MainActor func testSetAllowsContentJavaScript() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKWebpagePreferences(registrar)
 
-    let instance = WKWebpagePreferences()
-    let allow = true
-    try? api.pigeonDelegate.setAllowsContentJavaScript(
-      pigeonApi: api, pigeonInstance: instance, allow: allow)
+        let instance = WKWebpagePreferences()
+        let allow = true
+        try? api.pigeonDelegate.setAllowsContentJavaScript(
+            pigeonApi: api, pigeonInstance: instance, allow: allow
+        )
 
-    XCTAssertEqual(instance.allowsContentJavaScript, allow)
-  }
+        XCTAssertEqual(instance.allowsContentJavaScript, allow)
+    }
 }

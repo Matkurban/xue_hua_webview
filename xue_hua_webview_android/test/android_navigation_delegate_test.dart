@@ -343,6 +343,119 @@ void main() {
     );
 
     test(
+      'onLoadRequest is not called for an approved external scheme',
+      () async {
+        final opened = <String>[];
+        LoadRequestParams? loadRequestParams;
+        final androidNavigationDelegate = AndroidNavigationDelegate(
+          _buildCreationParams(),
+          openExternalUrl: (String url) async {
+            opened.add(url);
+            return null;
+          },
+        );
+
+        await androidNavigationDelegate.setOnLoadRequest((
+          LoadRequestParams params,
+        ) {
+          loadRequestParams = params;
+          return Future<void>.value();
+        });
+        await androidNavigationDelegate.setOnNavigationRequest((_) {
+          return NavigationDecision.navigate;
+        });
+
+        CapturingWebViewClient.lastCreatedDelegate.requestLoading!(
+          CapturingWebViewClient(),
+          TestWebView(),
+          android_webview.WebResourceRequest.pigeon_detached(
+            url: 'bilibili://root',
+            isForMainFrame: true,
+            isRedirect: false,
+            hasGesture: true,
+            method: 'GET',
+            requestHeaders: const <String, String>{},
+          ),
+        );
+
+        await Future<void>.delayed(Duration.zero);
+        expect(opened, <String>['bilibili://root']);
+        expect(loadRequestParams, isNull);
+      },
+    );
+
+    test('prevent does not open an external scheme', () async {
+      final opened = <String>[];
+      final androidNavigationDelegate = AndroidNavigationDelegate(
+        _buildCreationParams(),
+        openExternalUrl: (String url) async {
+          opened.add(url);
+          return null;
+        },
+      );
+
+      await androidNavigationDelegate.setOnLoadRequest((_) async {});
+      await androidNavigationDelegate.setOnNavigationRequest((_) {
+        return NavigationDecision.prevent;
+      });
+
+      CapturingWebViewClient.lastCreatedDelegate.requestLoading!(
+        CapturingWebViewClient(),
+        TestWebView(),
+        android_webview.WebResourceRequest.pigeon_detached(
+          url: 'bilibili://root',
+          isForMainFrame: true,
+          isRedirect: false,
+          hasGesture: true,
+          method: 'GET',
+          requestHeaders: const <String, String>{},
+        ),
+      );
+
+      await Future<void>.delayed(Duration.zero);
+      expect(opened, isEmpty);
+    });
+
+    test('approved external iframe does not call onLoadRequest', () async {
+      final opened = <String>[];
+      LoadRequestParams? loadRequestParams;
+      final androidNavigationDelegate = AndroidNavigationDelegate(
+        _buildCreationParams(),
+        openExternalUrl: (String url) async {
+          opened.add(url);
+          return null;
+        },
+      );
+
+      await androidNavigationDelegate.setOnLoadRequest((
+        LoadRequestParams params,
+      ) {
+        loadRequestParams = params;
+        return Future<void>.value();
+      });
+      await androidNavigationDelegate.setOnNavigationRequest((_) {
+        return NavigationDecision.navigate;
+      });
+
+      CapturingWebViewClient.lastCreatedDelegate.requestLoading!(
+        CapturingWebViewClient(),
+        TestWebView(),
+        android_webview.WebResourceRequest.pigeon_detached(
+          url: 'weixin://dl/business',
+          isForMainFrame: false,
+          isRedirect: false,
+          hasGesture: true,
+          method: 'GET',
+          requestHeaders: const <String, String>{},
+        ),
+      );
+
+      await Future<void>.delayed(Duration.zero);
+      expect(opened, <String>['weixin://dl/business']);
+      expect(loadRequestParams, isNull);
+    });
+
+    test(
       'onNavigationRequest from urlLoading should not be called when loadUrlCallback is not specified',
       () {
         final androidNavigationDelegate = AndroidNavigationDelegate(

@@ -5,6 +5,7 @@
 package com.kurban.xue_hua_webview_android;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.KeyEvent;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebResourceError;
@@ -70,8 +71,21 @@ public class WebViewClientProxyApi extends PigeonApiWebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(
         @NonNull WebView view, @NonNull WebResourceRequest request) {
+      final Uri uri = request.getUrl();
+      final boolean external = ExternalUrlOpener.isExternal(uri);
+
       api.getPigeonRegistrar()
           .runOnMainThread(() -> api.requestLoading(this, view, request, reply -> null));
+
+      if (external) {
+        if (!returnValueForShouldOverrideUrlLoading) {
+          final String fallback = ExternalUrlOpener.open(view.getContext(), uri);
+          if (fallback != null) {
+            view.loadUrl(fallback);
+          }
+        }
+        return true;
+      }
 
       // The client is only allowed to stop navigations that target the main frame because
       // overridden URLs are passed to `loadUrl` and `loadUrl` cannot load a subframe.

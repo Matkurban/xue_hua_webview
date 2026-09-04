@@ -19,7 +19,7 @@ Package: `xue_hua_webview_android`.
 
 Main types: `AndroidWebViewController`, `AndroidWebViewWidget`, `AndroidNavigationDelegate`, `AndroidWebViewCookieManager`, `AndroidLoadFileParams`, `AndroidJavaScriptChannelParams`, `AndroidWebViewPermissionRequest`, `AndroidWebViewPermissionResourceType`, `AndroidSslAuthError`, `AndroidWebResourceError`, `AndroidUrlChange`, `FileSelectorParams`.
 
-Important APIs: debugging, file/content access, media gesture, text zoom, wide viewport, geolocation, file selector, custom fullscreen widget, console, JS dialogs, scrollbars, overscroll, mixed content, WebAuthn/passkeys, Payment Request, window insets.
+Important APIs: debugging, file/content access, media gesture, text zoom, wide viewport, geolocation, built-in file selector plus optional `setOnShowFileSelector`, custom fullscreen widget, console, JS dialogs, scrollbars, overscroll, mixed content, WebAuthn/passkeys, Payment Request, window insets.
 
 ## iOS/macOS
 
@@ -27,7 +27,7 @@ Package: `xue_hua_webview_wkwebview`.
 
 Main types: `WebKitWebViewController`, `WebKitWebViewWidget`, `WebKitNavigationDelegate`, `WebKitWebViewCookieManager`, `WebKitLoadFileParams`, `WebKitJavaScriptChannelParams`, `WebKitWebViewPermissionRequest`, `WebKitSslAuthError`, `WebKitWebResourceError`.
 
-Important APIs: inline media, media gesture, App-Bound Domains, JavaScript popup policy, back/forward gestures, link preview, inspectable, WebKit local file read access, permission prompt.
+Important APIs: inline media, media gesture, App-Bound Domains, JavaScript popup policy, back/forward gestures, link preview, inspectable, WebKit local file read access, permission prompt, macOS `runOpenPanel` file inputs.
 
 ## Windows
 

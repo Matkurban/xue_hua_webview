@@ -4,36 +4,37 @@
 
 import WebKit
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class PreferencesProxyAPITests: XCTestCase {
-  @MainActor func testSetJavaScriptEnabled() throws {
-    if #available(iOS 14.0, macOS 11.0, *) {
-      throw XCTSkip("Required API is not available for this test.")
+    @MainActor func testSetJavaScriptEnabled() throws {
+        if #available(iOS 14.0, macOS 11.0, *) {
+            throw XCTSkip("Required API is not available for this test.")
 
-    } else {
-      let registrar = TestProxyApiRegistrar()
-      let api = registrar.apiDelegate.pigeonApiWKPreferences(registrar)
+        } else {
+            let registrar = TestProxyApiRegistrar()
+            let api = registrar.apiDelegate.pigeonApiWKPreferences(registrar)
 
-      let instance = WKPreferences()
-      let enabled = true
-      try? api.pigeonDelegate.setJavaScriptEnabled(
-        pigeonApi: api, pigeonInstance: instance, enabled: enabled)
+            let instance = WKPreferences()
+            let enabled = true
+            try? api.pigeonDelegate.setJavaScriptEnabled(
+                pigeonApi: api, pigeonInstance: instance, enabled: enabled
+            )
 
-      XCTAssertEqual(instance.javaScriptEnabled, enabled)
+            XCTAssertEqual(instance.javaScriptEnabled, enabled)
+        }
     }
-  }
 
-  @MainActor func testSetJavaScriptCanOpenWindowsAutomatically() throws {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKPreferences(registrar)
+    @MainActor func testSetJavaScriptCanOpenWindowsAutomatically() throws {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKPreferences(registrar)
 
-    let instance = WKPreferences()
-    let enabled = true
-    try api.pigeonDelegate.setJavaScriptCanOpenWindowsAutomatically(
-      pigeonApi: api, pigeonInstance: instance, enabled: enabled)
+        let instance = WKPreferences()
+        let enabled = true
+        try api.pigeonDelegate.setJavaScriptCanOpenWindowsAutomatically(
+            pigeonApi: api, pigeonInstance: instance, enabled: enabled
+        )
 
-    XCTAssertEqual(instance.javaScriptCanOpenWindowsAutomatically, enabled)
-  }
+        XCTAssertEqual(instance.javaScriptCanOpenWindowsAutomatically, enabled)
+    }
 }

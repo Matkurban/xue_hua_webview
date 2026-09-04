@@ -3,31 +3,25 @@
 // found in the LICENSE file.
 
 #if os(iOS)
-  import Flutter
+    import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+    import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+    #error("Unsupported platform.")
 #endif
 
 class TestBinaryMessenger: NSObject, FlutterBinaryMessenger {
-  func send(onChannel channel: String, message: Data?) {
+    func send(onChannel _: String, message _: Data?) {}
 
-  }
+    func send(
+        onChannel _: String, message _: Data?, binaryReply _: FlutterBinaryReply? = nil
+    ) {}
 
-  func send(
-    onChannel channel: String, message: Data?, binaryReply callback: FlutterBinaryReply? = nil
-  ) {
+    func setMessageHandlerOnChannel(
+        _: String, binaryMessageHandler _: FlutterBinaryMessageHandler? = nil
+    ) -> FlutterBinaryMessengerConnection {
+        return 0
+    }
 
-  }
-
-  func setMessageHandlerOnChannel(
-    _ channel: String, binaryMessageHandler handler: FlutterBinaryMessageHandler? = nil
-  ) -> FlutterBinaryMessengerConnection {
-    return 0
-  }
-
-  func cleanUpConnection(_ connection: FlutterBinaryMessengerConnection) {
-
-  }
+    func cleanUpConnection(_: FlutterBinaryMessengerConnection) {}
 }

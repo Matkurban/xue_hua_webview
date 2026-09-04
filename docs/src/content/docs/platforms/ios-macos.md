@@ -3,7 +3,7 @@ title: iOS and macOS
 description: WKWebView implementation, WebKit APIs, and Apple platform differences.
 ---
 
-iOS and macOS are provided by `xue_hua_webview_wkwebview ^1.0.0`. `xue_hua_webview` registers it as the default implementation for both Apple platforms.
+iOS and macOS are provided by `xue_hua_webview_wkwebview ^1.1.0`. `xue_hua_webview` registers it as the default implementation for both Apple platforms.
 
 ## Engine
 
@@ -88,6 +88,33 @@ The common `WebViewController.addJavaScriptChannel` automatically converts commo
 | `prompt()` | Lets the system prompt the user where supported. |
 
 Your app still needs the corresponding `Info.plist` privacy description keys.
+
+## File Selector
+
+iOS uses WKWebView's built-in picker for `<input type="file">`. There is no
+`WKUIDelegate.runOpenPanel` hook. Add `NSCameraUsageDescription` for `capture`
+and `NSPhotoLibraryUsageDescription` when older photo-library flows can appear.
+
+macOS implements `webView(_:runOpenPanelWith:initiatedByFrame:completionHandler:)`
+with `NSOpenPanel`. Multiple selection and directory choice follow
+`WKOpenPanelParameters`. Cancel or a missing window calls `completionHandler(nil)`.
+Sandboxed apps need `com.apple.security.files.user-selected.read-only`.
+
+On macOS, a new WKWebView appends a Safari-compatible
+`applicationNameForUserAgent` suffix (`Version/x.0 Safari/605.1.15`) when the
+configuration still uses the system default app name. Sites that reject a bare
+AppleWebKit user agent can load without a Dart override. `setUserAgent` still
+replaces the full string.
+
+## External App URLs
+
+Custom schemes from page content are opened with `UIApplication` / `NSWorkspace`
+and the navigation is cancelled so WKWebView does not try to load them.
+`onNavigationRequest` still receives the URL; `prevent` skips the system open.
+
+The plugin does not add `LSApplicationQueriesSchemes`. Direct `open` does not
+need that list. Declare schemes in the host `Info.plist` only if the app itself
+calls `canOpenURL`.
 
 ## Web Authentication and Passkeys
 

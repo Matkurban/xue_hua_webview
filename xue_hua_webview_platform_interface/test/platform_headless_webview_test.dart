@@ -47,21 +47,27 @@ void main() {
     );
   });
 
-  test('Default implementation of controller should throw unimplemented error', () {
-    final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
-      const PlatformHeadlessWebViewCreationParams(),
-    );
+  test(
+    'Default implementation of controller should throw unimplemented error',
+    () {
+      final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
+        const PlatformHeadlessWebViewCreationParams(),
+      );
 
-    expect(() => headless.controller, throwsUnimplementedError);
-  });
+      expect(() => headless.controller, throwsUnimplementedError);
+    },
+  );
 
-  test('Default implementation of isRunning should throw unimplemented error', () {
-    final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
-      const PlatformHeadlessWebViewCreationParams(),
-    );
+  test(
+    'Default implementation of isRunning should throw unimplemented error',
+    () {
+      final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
+        const PlatformHeadlessWebViewCreationParams(),
+      );
 
-    expect(() => headless.isRunning, throwsUnimplementedError);
-  });
+      expect(() => headless.isRunning, throwsUnimplementedError);
+    },
+  );
 
   test('Default implementation of run should throw unimplemented error', () {
     final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
@@ -71,13 +77,16 @@ void main() {
     expect(headless.run, throwsUnimplementedError);
   });
 
-  test('Default implementation of dispose should throw unimplemented error', () {
-    final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
-      const PlatformHeadlessWebViewCreationParams(),
-    );
+  test(
+    'Default implementation of dispose should throw unimplemented error',
+    () {
+      final PlatformHeadlessWebView headless = ExtendsPlatformHeadlessWebView(
+        const PlatformHeadlessWebViewCreationParams(),
+      );
 
-    expect(headless.dispose, throwsUnimplementedError);
-  });
+      expect(headless.dispose, throwsUnimplementedError);
+    },
+  );
 }
 
 class MockWebViewPlatformWithMixin extends MockWebViewPlatform

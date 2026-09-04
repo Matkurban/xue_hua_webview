@@ -54,15 +54,32 @@ await (controller.platform as AndroidWebViewController)
 
 ## 文件选择
 
+`<input type="file">` 无需 Dart 回调即可使用：
+
+| 平台 | 行为 |
+| --- | --- |
+| Android | 图片/视频走 Photo Picker，其他 MIME 走 `ACTION_GET_CONTENT`，`capture` 打开相机。 |
+| iOS | WKWebView 系统选择器（PHPicker / 文档选择器）。 |
+| macOS | `WKUIDelegate.runOpenPanel` 弹出 `NSOpenPanel`。 |
+| Windows / Linux / Web | 引擎或浏览器对话框。引擎回落，无公共 Dart 回调。 |
+
+取消、权限拒绝和失败都会用 `null` 完成原生回调，避免输入框假死。
+
+Android Photo Picker 与 SAF **不需要** `READ_MEDIA_*` 或 `READ_EXTERNAL_STORAGE`。相机直连会在运行时申请 `CAMERA`，宿主需在 `AndroidManifest.xml` 声明该权限。iOS 页面使用 `capture` 或相册选择时，需要在 `Info.plist` 声明 `NSCameraUsageDescription`，通常还要 `NSPhotoLibraryUsageDescription`。缺少用途说明可能导致崩溃。
+
+可选的 Android 覆盖：
+
 ```dart
 await (controller.platform as AndroidWebViewController)
     .setOnShowFileSelector((FileSelectorParams params) async {
   debugPrint('accept=${params.acceptTypes}');
-  return <String>['/path/to/file.png'];
+  return <String>['content://media/picker/0'];
 });
 ```
 
-`FileSelectorParams` 包含 `isCaptureEnabled`、`acceptTypes`、`filenameHint` 和 `mode`。
+返回空列表表示取消。`FileSelectorParams` 包含 `isCaptureEnabled`、`acceptTypes`、`filenameHint` 和 `mode`。
+
+仅当该自定义回调直接读取 MediaStore 时，才需要自行声明 API 33+ 的 `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`，或 API 32 及以下的 `READ_EXTERNAL_STORAGE`。
 
 ## 全屏 custom widget
 

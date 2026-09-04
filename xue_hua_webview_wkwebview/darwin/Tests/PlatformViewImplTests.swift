@@ -3,23 +3,22 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 #if os(iOS)
-  import UIKit
+    import UIKit
 #endif
 
 class PlatformViewImplTests: XCTestCase {
-  #if os(iOS)
-    func testPlatformViewImplStoresViewWithAWeakReference() {
-      var view: UIView? = UIView()
-      let platformView = PlatformViewImpl(uiView: view!)
+    #if os(iOS)
+        func testPlatformViewImplStoresViewWithAWeakReference() throws {
+            var view: UIView? = UIView()
+            let platformView = try PlatformViewImpl(uiView: XCTUnwrap(view))
 
-      XCTAssertNotNil(platformView.uiView)
+            XCTAssertNotNil(platformView.uiView)
 
-      view = nil
-      XCTAssertNil(platformView.uiView)
-    }
-  #endif
+            view = nil
+            XCTAssertNil(platformView.uiView)
+        }
+    #endif
 }

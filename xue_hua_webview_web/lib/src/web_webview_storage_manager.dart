@@ -81,8 +81,9 @@ class WebWebViewStorageManager extends PlatformWebViewStorageManager {
   Future<void> _clearIndexedDb() async {
     try {
       final web.IDBFactory factory = web.window.indexedDB;
-      final JSArray<web.IDBDatabaseInfo> databases =
-          await factory.databases().toDart;
+      final JSArray<web.IDBDatabaseInfo> databases = await factory
+          .databases()
+          .toDart;
       for (final web.IDBDatabaseInfo info in databases.toDart) {
         final String name = info.name;
         if (name.isNotEmpty) {

@@ -31,8 +31,9 @@ abstract class PlatformWebViewStorageManager extends PlatformInterface {
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebViewStorageManager storageManagerDelegate =
-        WebViewPlatform.instance!.createPlatformStorageManager(params);
+    final PlatformWebViewStorageManager storageManagerDelegate = WebViewPlatform
+        .instance!
+        .createPlatformStorageManager(params);
     PlatformInterface.verify(storageManagerDelegate, _token);
     return storageManagerDelegate;
   }

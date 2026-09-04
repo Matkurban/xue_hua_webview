@@ -19,6 +19,14 @@ public class Uri {
     this.url = url;
   }
 
+  public String getScheme() {
+    final int colon = url.indexOf(':');
+    if (colon <= 0) {
+      return null;
+    }
+    return url.substring(0, colon);
+  }
+
   @NonNull
   @Override
   public String toString() {

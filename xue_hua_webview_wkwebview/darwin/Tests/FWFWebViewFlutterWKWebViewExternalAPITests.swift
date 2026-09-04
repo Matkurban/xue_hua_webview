@@ -4,246 +4,242 @@
 
 import WebKit
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 #if os(iOS)
-  import Flutter
+    import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+    import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+    #error("Unsupported platform.")
 #endif
 
 class FWFWebViewFlutterWKWebViewExternalAPITests: XCTestCase {
-  @MainActor func testWebViewForIdentifier() {
-    let registry = TestRegistry()
+    @MainActor func testWebViewForIdentifier() throws {
+        let registry = TestRegistry()
+
+        #if os(iOS)
+            let registrar = try XCTUnwrap(registry.registrar(forPlugin: ""))
+        #elseif os(macOS)
+            let registrar = registry.registrar(forPlugin: "")
+        #endif
+
+        WebViewFlutterPlugin.register(with: registrar)
+
+        let plugin = registry.registrar.plugin
+
+        let webView = WKWebView(frame: .zero)
+        let webViewIdentifier = 0
+        plugin?.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
+            webView, withIdentifier: Int64(webViewIdentifier)
+        )
+
+        let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
+            forIdentifier: Int64(webViewIdentifier), withPluginRegistry: registry
+        )
+        XCTAssertEqual(result, webView)
+    }
+
+    @MainActor func testWebViewForIdentifierHandlesIncorrectRegistry() {
+        let registry = TestRegistry(publishedValue: false)
+        // Ensure that passing an empty registry, such as the FlutterAppDelegate
+        // in an app that has adopted UIScene, gracefully returns nil.
+        let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
+            forIdentifier: 0, withPluginRegistry: registry
+        )
+        XCTAssertEqual(result, nil)
+    }
 
     #if os(iOS)
-      let registrar = registry.registrar(forPlugin: "")!
-    #elseif os(macOS)
-      let registrar = registry.registrar(forPlugin: "")
+        @MainActor func testWebViewForIdentifierFromRegistrarUsesOfficialLookup() throws {
+            let registry = TestRegistry()
+            let registrar = try XCTUnwrap(registry.registrar(forPlugin: ""))
+
+            WebViewFlutterPlugin.register(with: registrar)
+
+            let plugin = try XCTUnwrap(registry.registrar.plugin)
+            let webView = WKWebView(frame: .zero)
+            let webViewIdentifier = 1
+            plugin.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
+                webView, withIdentifier: Int64(webViewIdentifier)
+            )
+
+            // Prove this path does not depend on the compatibility lookup.
+            WebViewFlutterPluginLookup.unregister(
+                plugin, for: registry.registrar.testBinaryMessenger
+            )
+
+            let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
+                forIdentifier: Int64(webViewIdentifier), withPluginRegistrar: registrar
+            )
+            XCTAssertEqual(result, webView)
+        }
+
+        @MainActor func testWebViewForIdentifierFromRegistrarUsesLegacyLookup() throws {
+            let registry = TestRegistry()
+            registry.registrar.supportsOfficialPublishedValueLookup = false
+            let registrar = try XCTUnwrap(registry.registrar(forPlugin: ""))
+
+            WebViewFlutterPlugin.register(with: registrar)
+
+            let plugin = try XCTUnwrap(registry.registrar.plugin)
+            let webView = WKWebView(frame: .zero)
+            let webViewIdentifier = 2
+            plugin.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
+                webView, withIdentifier: Int64(webViewIdentifier)
+            )
+
+            let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
+                forIdentifier: Int64(webViewIdentifier), withPluginRegistrar: registrar
+            )
+            XCTAssertEqual(result, webView)
+        }
+
+        @MainActor func testWebViewForIdentifierFromRegistrarIsEngineScoped() throws {
+            let registry = TestRegistry()
+            registry.registrar.supportsOfficialPublishedValueLookup = false
+            try WebViewFlutterPlugin.register(with: XCTUnwrap(registry.registrar(forPlugin: "")))
+
+            let unrelatedRegistrar = TestFlutterPluginRegistrar()
+            unrelatedRegistrar.supportsOfficialPublishedValueLookup = false
+            let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
+                forIdentifier: 0, withPluginRegistrar: unrelatedRegistrar
+            )
+            XCTAssertNil(result)
+        }
+
+        @MainActor func testLegacyRegistrarLookupIsRemovedDuringTeardown() throws {
+            let registry = TestRegistry()
+            registry.registrar.supportsOfficialPublishedValueLookup = false
+            let registrar = try XCTUnwrap(registry.registrar(forPlugin: ""))
+            WebViewFlutterPlugin.register(with: registrar)
+
+            let plugin = try XCTUnwrap(registry.registrar.plugin)
+            plugin.detachFromEngine(for: registrar)
+
+            XCTAssertNil(WebViewFlutterPluginLookup.plugin(publishedBy: registrar))
+        }
     #endif
-
-    WebViewFlutterPlugin.register(with: registrar)
-
-    let plugin = registry.registrar.plugin
-
-    let webView = WKWebView(frame: .zero)
-    let webViewIdentifier = 0
-    plugin?.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
-      webView, withIdentifier: Int64(webViewIdentifier))
-
-    let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
-      forIdentifier: Int64(webViewIdentifier), withPluginRegistry: registry)
-    XCTAssertEqual(result, webView)
-  }
-
-  @MainActor func testWebViewForIdentifierHandlesIncorrectRegistry() {
-    let registry = TestRegistry(publishedValue: false)
-    // Ensure that passing an empty registry, such as the FlutterAppDelegate
-    // in an app that has adopted UIScene, gracefully returns nil.
-    let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
-      forIdentifier: 0, withPluginRegistry: registry)
-    XCTAssertEqual(result, nil)
-  }
-
-  #if os(iOS)
-    @MainActor func testWebViewForIdentifierFromRegistrarUsesOfficialLookup() {
-      let registry = TestRegistry()
-      let registrar = registry.registrar(forPlugin: "")!
-
-      WebViewFlutterPlugin.register(with: registrar)
-
-      let plugin = registry.registrar.plugin!
-      let webView = WKWebView(frame: .zero)
-      let webViewIdentifier = 1
-      plugin.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
-        webView, withIdentifier: Int64(webViewIdentifier))
-
-      // Prove this path does not depend on the compatibility lookup.
-      WebViewFlutterPluginLookup.unregister(
-        plugin, for: registry.registrar.testBinaryMessenger)
-
-      let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
-        forIdentifier: Int64(webViewIdentifier), withPluginRegistrar: registrar)
-      XCTAssertEqual(result, webView)
-    }
-
-    @MainActor func testWebViewForIdentifierFromRegistrarUsesLegacyLookup() {
-      let registry = TestRegistry()
-      registry.registrar.supportsOfficialPublishedValueLookup = false
-      let registrar = registry.registrar(forPlugin: "")!
-
-      WebViewFlutterPlugin.register(with: registrar)
-
-      let plugin = registry.registrar.plugin!
-      let webView = WKWebView(frame: .zero)
-      let webViewIdentifier = 2
-      plugin.proxyApiRegistrar?.instanceManager.addDartCreatedInstance(
-        webView, withIdentifier: Int64(webViewIdentifier))
-
-      let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
-        forIdentifier: Int64(webViewIdentifier), withPluginRegistrar: registrar)
-      XCTAssertEqual(result, webView)
-    }
-
-    @MainActor func testWebViewForIdentifierFromRegistrarIsEngineScoped() {
-      let registry = TestRegistry()
-      registry.registrar.supportsOfficialPublishedValueLookup = false
-      WebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "")!)
-
-      let unrelatedRegistrar = TestFlutterPluginRegistrar()
-      unrelatedRegistrar.supportsOfficialPublishedValueLookup = false
-      let result = FWFWebViewFlutterWKWebViewExternalAPI.webView(
-        forIdentifier: 0, withPluginRegistrar: unrelatedRegistrar)
-      XCTAssertNil(result)
-    }
-
-    @MainActor func testLegacyRegistrarLookupIsRemovedDuringTeardown() {
-      let registry = TestRegistry()
-      registry.registrar.supportsOfficialPublishedValueLookup = false
-      let registrar = registry.registrar(forPlugin: "")!
-      WebViewFlutterPlugin.register(with: registrar)
-
-      let plugin = registry.registrar.plugin!
-      plugin.detachFromEngine(for: registrar)
-
-      XCTAssertNil(WebViewFlutterPluginLookup.plugin(publishedBy: registrar))
-    }
-  #endif
 }
 
 class TestRegistry: NSObject, FlutterPluginRegistry {
-  let registrar = TestFlutterPluginRegistrar()
-  let publishedValue: Bool
+    let registrar = TestFlutterPluginRegistrar()
+    let publishedValue: Bool
 
-  init(publishedValue: Bool) {
-    self.publishedValue = publishedValue
-  }
-
-  convenience override init() {
-    self.init(publishedValue: true)
-  }
-
-  #if os(iOS)
-    func registrar(forPlugin pluginKey: String) -> FlutterPluginRegistrar? {
-      return registrar
+    init(publishedValue: Bool) {
+        self.publishedValue = publishedValue
     }
-  #elseif os(macOS)
-    func registrar(forPlugin pluginKey: String) -> FlutterPluginRegistrar {
-      return registrar
-    }
-  #endif
 
-  func hasPlugin(_ pluginKey: String) -> Bool {
-    return true
-  }
-
-  func valuePublished(byPlugin pluginKey: String) -> NSObject? {
-    if publishedValue && pluginKey == "WebViewFlutterPlugin" {
-      return registrar.plugin
+    override convenience init() {
+        self.init(publishedValue: true)
     }
-    return nil
-  }
+
+    #if os(iOS)
+        func registrar(forPlugin _: String) -> FlutterPluginRegistrar? {
+            return registrar
+        }
+    #elseif os(macOS)
+        func registrar(forPlugin _: String) -> FlutterPluginRegistrar {
+            return registrar
+        }
+    #endif
+
+    func hasPlugin(_: String) -> Bool {
+        return true
+    }
+
+    func valuePublished(byPlugin pluginKey: String) -> NSObject? {
+        if publishedValue, pluginKey == "WebViewFlutterPlugin" {
+            return registrar.plugin
+        }
+        return nil
+    }
 }
 
 class TestFlutterTextureRegistry: NSObject, FlutterTextureRegistry {
-  func register(_ texture: FlutterTexture) -> Int64 {
-    return 0
-  }
+    func register(_: FlutterTexture) -> Int64 {
+        return 0
+    }
 
-  func textureFrameAvailable(_ textureId: Int64) {
+    func textureFrameAvailable(_: Int64) {}
 
-  }
-
-  func unregisterTexture(_ textureId: Int64) {
-
-  }
+    func unregisterTexture(_: Int64) {}
 }
 
 class TestFlutterPluginRegistrar: NSObject, FlutterPluginRegistrar {
-  let testBinaryMessenger = TestBinaryMessenger()
-  var publishedValue: NSObject?
-  var supportsOfficialPublishedValueLookup = true
-  var plugin: WebViewFlutterPlugin? {
-    return publishedValue as? WebViewFlutterPlugin
-  }
-
-  #if os(iOS)
-    var viewController: UIViewController?
-    var sceneDelegate: AnyObject?
-
-    func messenger() -> FlutterBinaryMessenger {
-      return testBinaryMessenger
+    let testBinaryMessenger = TestBinaryMessenger()
+    var publishedValue: NSObject?
+    var supportsOfficialPublishedValueLookup = true
+    var plugin: WebViewFlutterPlugin? {
+        return publishedValue as? WebViewFlutterPlugin
     }
 
-    func textures() -> FlutterTextureRegistry {
-      return TestFlutterTextureRegistry()
+    #if os(iOS)
+        var viewController: UIViewController?
+        var sceneDelegate: AnyObject?
+
+        func messenger() -> FlutterBinaryMessenger {
+            return testBinaryMessenger
+        }
+
+        func textures() -> FlutterTextureRegistry {
+            return TestFlutterTextureRegistry()
+        }
+
+        func addApplicationDelegate(_: FlutterPlugin) {}
+
+        func register(
+            _: FlutterPlatformViewFactory, withId _: String,
+            gestureRecognizersBlockingPolicy _: FlutterPlatformViewGestureRecognizersBlockingPolicy
+        ) {}
+
+        func addSceneDelegate(_ delegate: any FlutterSceneLifeCycleDelegate) {
+            sceneDelegate = delegate as AnyObject
+        }
+    #elseif os(macOS)
+        var view: NSView?
+        var viewController: NSViewController?
+
+        var messenger: FlutterBinaryMessenger {
+            return testBinaryMessenger
+        }
+
+        var textures: FlutterTextureRegistry {
+            return TestFlutterTextureRegistry()
+        }
+
+        func addApplicationDelegate(_: FlutterAppLifecycleDelegate) {}
+    #endif
+
+    func register(_: FlutterPlatformViewFactory, withId _: String) {}
+
+    func publish(_ value: NSObject) {
+        publishedValue = value
     }
 
-    func addApplicationDelegate(_ delegate: FlutterPlugin) {
+    func addMethodCallDelegate(_: FlutterPlugin, channel _: FlutterMethodChannel) {}
 
+    func lookupKey(forAsset _: String) -> String {
+        return ""
     }
 
-    func register(
-      _ factory: FlutterPlatformViewFactory, withId factoryId: String,
-      gestureRecognizersBlockingPolicy: FlutterPlatformViewGestureRecognizersBlockingPolicy
-    ) {
+    func lookupKey(forAsset _: String, fromPackage _: String) -> String {
+        return ""
     }
 
-    func addSceneDelegate(_ delegate: any FlutterSceneLifeCycleDelegate) {
-      sceneDelegate = delegate as AnyObject
-    }
-  #elseif os(macOS)
-    var view: NSView?
-    var viewController: NSViewController?
-
-    var messenger: FlutterBinaryMessenger {
-      return testBinaryMessenger
+    func valuePublished(byPlugin pluginKey: String) -> NSObject? {
+        if pluginKey == "WebViewFlutterPlugin" {
+            return publishedValue
+        }
+        return nil
     }
 
-    var textures: FlutterTextureRegistry {
-      return TestFlutterTextureRegistry()
+    override func responds(to aSelector: Selector!) -> Bool {
+        if !supportsOfficialPublishedValueLookup
+            && aSelector == NSSelectorFromString("valuePublishedByPlugin:")
+        {
+            return false
+        }
+        return super.responds(to: aSelector)
     }
-
-    func addApplicationDelegate(_ delegate: FlutterAppLifecycleDelegate) {
-
-    }
-  #endif
-
-  func register(_ factory: FlutterPlatformViewFactory, withId factoryId: String) {
-  }
-
-  func publish(_ value: NSObject) {
-    publishedValue = value
-  }
-
-  func addMethodCallDelegate(_ delegate: FlutterPlugin, channel: FlutterMethodChannel) {
-
-  }
-
-  func lookupKey(forAsset asset: String) -> String {
-    return ""
-  }
-
-  func lookupKey(forAsset asset: String, fromPackage package: String) -> String {
-    return ""
-  }
-
-  func valuePublished(byPlugin pluginKey: String) -> NSObject? {
-    if pluginKey == "WebViewFlutterPlugin" {
-      return publishedValue
-    }
-    return nil
-  }
-
-  override func responds(to aSelector: Selector!) -> Bool {
-    if !supportsOfficialPublishedValueLookup
-      && aSelector == NSSelectorFromString("valuePublishedByPlugin:")
-    {
-      return false
-    }
-    return super.responds(to: aSelector)
-  }
 }

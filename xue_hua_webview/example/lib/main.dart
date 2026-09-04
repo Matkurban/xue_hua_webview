@@ -2,33 +2,127 @@ import 'package:flutter/material.dart';
 import 'package:abutil/abutil.dart';
 import 'package:xue_hua_webview/xue_hua_webview.dart';
 
+enum ExampleDemo { fileChooser, bilibili }
+
 void main() {
-  runApp(const BilibiliApp());
+  runApp(const ExampleApp());
 }
 
-class BilibiliApp extends StatelessWidget {
-  const BilibiliApp({super.key});
+class ExampleApp extends StatelessWidget {
+  const ExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bilibili',
+      title: 'xue_hua_webview',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
       ),
-      home: const BilibiliPage(),
+      home: const ExampleHomePage(),
     );
   }
 }
 
-class BilibiliPage extends StatefulWidget {
-  const BilibiliPage({super.key});
+class ExampleHomePage extends StatelessWidget {
+  const ExampleHomePage({super.key});
 
   @override
-  State<BilibiliPage> createState() => _BilibiliPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('选择测试')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: <Widget>[
+          _DemoTile(
+            icon: Icons.folder_open,
+            title: '本地 HTML（文件选择）',
+            subtitle: '加载 assets/file_chooser.html，手测各平台选文件、相册和拍照',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      const ExampleWebViewPage(demo: ExampleDemo.fileChooser),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _DemoTile(
+            icon: Icons.public,
+            title: '哔哩哔哩',
+            subtitle: '打开 bilibili.com，手测 H5 打开 App 等在线行为',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      const ExampleWebViewPage(demo: ExampleDemo.bilibili),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _BilibiliPageState extends State<BilibiliPage> {
+class _DemoTile extends StatelessWidget {
+  const _DemoTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: 32),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ExampleWebViewPage extends StatefulWidget {
+  const ExampleWebViewPage({super.key, required this.demo});
+
+  final ExampleDemo demo;
+
+  @override
+  State<ExampleWebViewPage> createState() => _ExampleWebViewPageState();
+}
+
+class _ExampleWebViewPageState extends State<ExampleWebViewPage> {
   late final WebViewController _controller;
   int _progress = 0;
 
@@ -37,6 +131,13 @@ class _BilibiliPageState extends State<BilibiliPage> {
     super.initState();
     _controller = WebViewController();
     _configureAndLoad();
+  }
+
+  String get _title {
+    return switch (widget.demo) {
+      ExampleDemo.fileChooser => '文件选择',
+      ExampleDemo.bilibili => '哔哩哔哩',
+    };
   }
 
   Future<void> _configureAndLoad() async {
@@ -72,7 +173,12 @@ class _BilibiliPageState extends State<BilibiliPage> {
       );
     }
 
-    await _controller.loadRequest(Uri.parse('https://www.bilibili.com'));
+    switch (widget.demo) {
+      case ExampleDemo.fileChooser:
+        await _controller.loadFlutterAsset('assets/file_chooser.html');
+      case ExampleDemo.bilibili:
+        await _controller.loadRequest(Uri.parse('https://www.bilibili.com'));
+    }
   }
 
   Future<void> _onDemoSelected(String value) async {
@@ -139,7 +245,7 @@ class _BilibiliPageState extends State<BilibiliPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bilibili'),
+        title: Text(_title),
         actions: isWeb()
             ? const <Widget>[]
             : <Widget>[

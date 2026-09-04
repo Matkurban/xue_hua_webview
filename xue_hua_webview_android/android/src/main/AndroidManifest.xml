@@ -1,1 +1,28 @@
-<manifest />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <intent>
+            <action android:name="android.media.action.VIDEO_CAPTURE" />
+        </intent>
+    </queries>
+
+    <application>
+        <provider
+            android:name="com.kurban.xue_hua_webview_android.XueHuaWebViewFileProvider"
+            android:authorities="${applicationId}.xue_hua_webview_android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/xue_hua_webview_file_paths" />
+        </provider>
+    </application>
+</manifest>

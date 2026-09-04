@@ -10,11 +10,11 @@ import Security
 /// The native method needs to return two values, so this custom class is
 /// created to support this.
 class GetTrustResultResponse {
-  let result: SecTrustResultType
-  let resultCode: OSStatus
+    let result: SecTrustResultType
+    let resultCode: OSStatus
 
-  init(result: SecTrustResultType, resultCode: OSStatus) {
-    self.result = result
-    self.resultCode = resultCode
-  }
+    init(result: SecTrustResultType, resultCode: OSStatus) {
+        self.result = result
+        self.resultCode = resultCode
+    }
 }

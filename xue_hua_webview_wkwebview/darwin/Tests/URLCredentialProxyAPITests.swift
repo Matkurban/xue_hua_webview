@@ -3,16 +3,16 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class URLCredentialProxyAPITests: XCTestCase {
-  func testWithUser() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiURLCredential(registrar)
+    func testWithUser() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiURLCredential(registrar)
 
-    let instance = try? api.pigeonDelegate.withUser(
-      pigeonApi: api, user: "myString", password: "myString", persistence: .none)
-    XCTAssertNotNil(instance)
-  }
+        let instance = try? api.pigeonDelegate.withUser(
+            pigeonApi: api, user: "myString", password: "myString", persistence: .none
+        )
+        XCTAssertNotNil(instance)
+    }
 }

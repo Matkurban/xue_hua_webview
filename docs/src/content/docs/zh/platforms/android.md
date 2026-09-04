@@ -3,7 +3,7 @@ title: Android
 description: Android WebView 实现、API 和限制。
 ---
 
-Android 由 `xue_hua_webview_android ^1.0.0` 提供，`xue_hua_webview` 将它注册为默认 Android 实现。
+Android 由 `xue_hua_webview_android ^1.1.0` 提供，`xue_hua_webview` 将它注册为默认 Android 实现。
 
 | 项 | 值 |
 | --- | --- |
@@ -26,7 +26,7 @@ Android 由 `xue_hua_webview_android ^1.0.0` 提供，`xue_hua_webview` 将它�
 | `setUseWideViewPort` | 启用 viewport meta/wide viewport。 |
 | `setAllowContentAccess` | 控制 `content://` 访问。 |
 | `setGeolocationEnabled` | 启用定位。 |
-| `setOnShowFileSelector` | 处理 `<input type="file">`。 |
+| `setOnShowFileSelector` | 可选覆盖 `<input type="file">`。未设置时走内置选择器。 |
 | `setGeolocationPermissionsPromptCallbacks` | 处理 Geolocation API 提示。 |
 | `setCustomWidgetCallbacks` | 处理视频等全屏 custom view。 |
 | `setMixedContentMode` | 控制 HTTPS 页面加载 HTTP 内容。 |
@@ -69,14 +69,37 @@ if (await android.isWebViewFeatureSupported(
 
 ## 文件选择
 
+未设置 `setOnShowFileSelector` 时，`<input type="file">` 使用内置选择器：
+
+- 图片或视频 accept 类型走 Android Photo Picker（无需存储权限）。
+- 其他 MIME 走 `ACTION_GET_CONTENT`。
+- `capture` 在获得运行时 `CAMERA` 后打开相机。
+- 多选遵循 `FileSelectorMode.openMultiple`。
+- 取消、权限拒绝和失败都会对 `filePathCallback` 传入 `null`。
+
+可选覆盖：
+
 ```dart
 await (controller.platform as AndroidWebViewController)
     .setOnShowFileSelector((FileSelectorParams params) async {
-  return <String>['/sdcard/Download/file.png'];
+  return <String>['content://media/picker/0'];
 });
 ```
 
+返回 `content://...` 等文件 URI 字符串。空列表表示取消。
 `FileSelectorMode` 包括 `open`、`openMultiple` 和 `save`。
+
+相机直连需在宿主 manifest 声明 `CAMERA`。除非自定义回调直接读 MediaStore，否则不要添加 `READ_MEDIA_*`。
+
+## 打开外部 App
+
+页面里的自定义 scheme（`bilibili://`、`weixin://`、`intent://`、`mailto:`、
+`tel:`）会用 `ACTION_VIEW` 交给系统，而不会在 WebView 中加载。Chrome
+`intent://` 使用 `Intent.parseUri`；若 App 未安装且带有
+`S.browser_fallback_url` 的 http/https 地址，则回落到 WebView 加载。
+`startActivity` 不需要在 `<queries>` 里声明这些 scheme。未安装时静默失败。
+
+`onNavigationRequest` 仍会收到该 URL。返回 `prevent` 可拦住拉起。
 
 ## Cookie 与 native 访问
 

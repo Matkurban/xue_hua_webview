@@ -63,6 +63,8 @@ android {
 
     dependencies {
         implementation("androidx.annotation:annotation:1.10.0")
+        implementation("androidx.activity:activity:1.9.3")
+        implementation("androidx.core:core:1.15.0")
         implementation("androidx.webkit:webkit:1.15.0")
         testImplementation("junit:junit:4.13.2")
         testImplementation("org.mockito:mockito-core:5.23.0")

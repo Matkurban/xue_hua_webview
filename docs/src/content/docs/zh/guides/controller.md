@@ -129,7 +129,7 @@ if (await controller.supportsSetScrollBarsEnabled()) {
 | --- | --- |
 | `setBackgroundColor` | 设置背景色；macOS 12+ 使用原生 API，更早版本打印说明并安全忽略。 |
 | `enableZoom` | 控制缩放能力；macOS 使用原生 magnification。 |
-| `setUserAgent` / `getUserAgent` | 设置和读取 UA；Web 对非空 override 打印一次说明并忽略。 |
+| `setUserAgent` / `getUserAgent` | 设置和读取 UA；Web 对非空 override 打印一次说明并忽略。macOS 未覆盖时会补 Safari 兼容后缀。 |
 | `setOverScrollMode` | 控制 overscroll；macOS 因没有公开 API 而打印说明并安全忽略，部分平台通过 CSS 注入实现。 |
 
 ## 访问平台实现

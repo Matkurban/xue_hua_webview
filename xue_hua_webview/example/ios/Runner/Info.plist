@@ -59,6 +59,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This example allows pages to use the camera after you approve the request.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This example allows pages to use the microphone after you approve the request.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This example allows pages to pick photos or videos after you approve the request.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

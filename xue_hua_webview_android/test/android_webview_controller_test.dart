@@ -1727,10 +1727,9 @@ void main() {
       );
 
       verify(
-        mockWebView.addDocumentStartJavaScript(
-          'window.ready = true;',
-          <String>['*'],
-        ),
+        mockWebView.addDocumentStartJavaScript('window.ready = true;', <String>[
+          '*',
+        ]),
       ).called(1);
     });
 

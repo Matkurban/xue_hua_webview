@@ -41,7 +41,9 @@ void main() {
     });
 
     test('JavaScriptAsyncResult', () {
-      const success = JavaScriptAsyncResult(value: <String, Object?>{'ok': true});
+      const success = JavaScriptAsyncResult(
+        value: <String, Object?>{'ok': true},
+      );
       expect(success.hasError, isFalse);
       expect(success.value, <String, Object?>{'ok': true});
 

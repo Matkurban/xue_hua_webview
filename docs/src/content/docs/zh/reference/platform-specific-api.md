@@ -19,7 +19,7 @@ if (controller.platform is WindowsWebViewController) {
 
 主要类型：`AndroidWebViewController`、`AndroidWebViewWidget`、`AndroidNavigationDelegate`、`AndroidWebViewCookieManager`、`AndroidLoadFileParams`、`AndroidJavaScriptChannelParams`、`AndroidWebViewPermissionRequest`、`AndroidWebViewPermissionResourceType`、`AndroidSslAuthError`、`AndroidWebResourceError`、`AndroidUrlChange`、`FileSelectorParams`。
 
-重要 API：debugging、file/content access、media gesture、text zoom、wide viewport、geolocation、file selector、custom fullscreen widget、console、JS dialogs、scrollbars、overscroll、mixed content、WebAuthn/Passkey、Payment Request、window insets。
+重要 API：debugging、file/content access、media gesture、text zoom、wide viewport、geolocation、内置文件选择器及可选 `setOnShowFileSelector`、custom fullscreen widget、console、JS dialogs、scrollbars、overscroll、mixed content、WebAuthn/Passkey、Payment Request、window insets。
 
 ## iOS/macOS
 
@@ -27,7 +27,7 @@ if (controller.platform is WindowsWebViewController) {
 
 主要类型：`WebKitWebViewController`、`WebKitWebViewWidget`、`WebKitNavigationDelegate`、`WebKitWebViewCookieManager`、`WebKitLoadFileParams`、`WebKitJavaScriptChannelParams`、`WebKitWebViewPermissionRequest`、`WebKitSslAuthError`、`WebKitWebResourceError`。
 
-重要 API：inline media、media gesture、App-Bound Domains、JavaScript popup policy、back/forward gestures、link preview、inspectable、WebKit 本地文件 read access、permission prompt。
+重要 API：inline media、media gesture、App-Bound Domains、JavaScript popup policy、back/forward gestures、link preview、inspectable、WebKit 本地文件 read access、permission prompt、macOS `runOpenPanel` 文件选择。
 
 ## Windows
 

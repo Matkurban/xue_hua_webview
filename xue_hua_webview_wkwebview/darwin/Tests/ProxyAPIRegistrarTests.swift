@@ -3,17 +3,18 @@
 // found in the LICENSE file.
 
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class ProxyAPIRegistrarTests: XCTestCase {
-  func testLogFlutterMethodFailureDoesNotThrowAnError() {
-    let registrar = TestProxyApiRegistrar()
+    func testLogFlutterMethodFailureDoesNotThrowAnError() {
+        let registrar = TestProxyApiRegistrar()
 
-    XCTExpectFailure("Method should log a message and not throw an error.") {
-      XCTAssertThrowsError(
-        registrar.logFlutterMethodFailure(
-          PigeonError(code: "code", message: "message", details: nil), methodName: "aMethod"))
+        XCTExpectFailure("Method should log a message and not throw an error.") {
+            XCTAssertThrowsError(
+                registrar.logFlutterMethodFailure(
+                    PigeonError(code: "code", message: "message", details: nil), methodName: "aMethod"
+                )
+            )
+        }
     }
-  }
 }

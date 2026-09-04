@@ -9,9 +9,9 @@ import Foundation
 /// Since `URLRequest` is a struct, it is pass by value instead of pass by reference. This makes
 /// it not possible to modify the properties of a struct with the typical ProxyAPI system.
 class URLRequestWrapper {
-  var value: URLRequest
+    var value: URLRequest
 
-  init(_ value: URLRequest) {
-    self.value = value
-  }
+    init(_ value: URLRequest) {
+        self.value = value
+    }
 }

@@ -4,49 +4,52 @@
 
 import WebKit
 import XCTest
-
 @testable import xue_hua_webview_wkwebview
 
 class UserScriptProxyAPITests: XCTestCase {
-  func testPigeonDefaultConstructor() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
+    func testPigeonDefaultConstructor() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
 
-    let instance = try? api.pigeonDelegate.pigeonDefaultConstructor(
-      pigeonApi: api, source: "myString", injectionTime: .atDocumentStart, isForMainFrameOnly: true)
-    XCTAssertNotNil(instance)
-  }
+        let instance = try? api.pigeonDelegate.pigeonDefaultConstructor(
+            pigeonApi: api, source: "myString", injectionTime: .atDocumentStart, isForMainFrameOnly: true
+        )
+        XCTAssertNotNil(instance)
+    }
 
-  @MainActor func testSource() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
+    @MainActor func testSource() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
 
-    let instance = WKUserScript(
-      source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-    let value = try? api.pigeonDelegate.source(pigeonApi: api, pigeonInstance: instance)
+        let instance = WKUserScript(
+            source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false
+        )
+        let value = try? api.pigeonDelegate.source(pigeonApi: api, pigeonInstance: instance)
 
-    XCTAssertEqual(value, instance.source)
-  }
+        XCTAssertEqual(value, instance.source)
+    }
 
-  @MainActor func testInjectionTime() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
+    @MainActor func testInjectionTime() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
 
-    let instance = WKUserScript(
-      source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-    let value = try? api.pigeonDelegate.injectionTime(pigeonApi: api, pigeonInstance: instance)
+        let instance = WKUserScript(
+            source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false
+        )
+        let value = try? api.pigeonDelegate.injectionTime(pigeonApi: api, pigeonInstance: instance)
 
-    XCTAssertEqual(value, .atDocumentEnd)
-  }
+        XCTAssertEqual(value, .atDocumentEnd)
+    }
 
-  @MainActor func testIsMainFrameOnly() {
-    let registrar = TestProxyApiRegistrar()
-    let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
+    @MainActor func testIsMainFrameOnly() {
+        let registrar = TestProxyApiRegistrar()
+        let api = registrar.apiDelegate.pigeonApiWKUserScript(registrar)
 
-    let instance = WKUserScript(
-      source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-    let value = try? api.pigeonDelegate.isForMainFrameOnly(pigeonApi: api, pigeonInstance: instance)
+        let instance = WKUserScript(
+            source: "source", injectionTime: .atDocumentEnd, forMainFrameOnly: false
+        )
+        let value = try? api.pigeonDelegate.isForMainFrameOnly(pigeonApi: api, pigeonInstance: instance)
 
-    XCTAssertEqual(value, instance.isForMainFrameOnly)
-  }
+        XCTAssertEqual(value, instance.isForMainFrameOnly)
+    }
 }

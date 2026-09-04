@@ -15,7 +15,9 @@ title: 平台设置
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
-如果 WebView 表单控件需要 Material Components 风格，请让应用主题兼容 Material Components。文件选择、拍照、录音等流程还需要应用自己处理 Android 运行时权限。
+`CAMERA` 用于 `<input type="file" capture>` 和 `getUserMedia` 相机。插件已按可选硬件声明该权限。Photo Picker 与 `ACTION_GET_CONTENT` 不需要 `READ_MEDIA_*` 或 `READ_EXTERNAL_STORAGE`。只有自定义 `setOnShowFileSelector` 直接读 MediaStore 时才需要这些存储权限。
+
+如果 WebView 表单控件需要 Material Components 风格，请让应用主题兼容 Material Components。文件输入默认走内置选择器；`setOnShowFileSelector` 是可选覆盖。网页申请相机或麦克风前，宿主仍需先获得 Android 运行时权限，再调用 `request.grant()`。
 
 ## iOS
 
@@ -26,9 +28,13 @@ title: 平台设置
 <string>Allow pages to use the camera after approval.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>Allow pages to use the microphone after approval.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Allow pages to pick photos or videos after approval.</string>
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>Allow pages to request location.</string>
 ```
+
+`<input type="file">` 使用 WKWebView 系统选择器。缺少 `NSCameraUsageDescription` 时，`capture` 流程可能崩溃。
 
 HTTPS 页面不需要额外的 App Transport Security（ATS）例外。明文 HTTP 会被 ATS 拦截，除非宿主应用在 `Info.plist` 中为对应域名添加例外（例如 `NSExceptionDomains`）。不要默认开启 `NSAllowsArbitraryLoads`，除非你明确接受其安全代价。
 
@@ -41,7 +47,11 @@ App-Bound Domains 需要宿主应用配置域名，并用 `WebKitWebViewControll
 ```xml
 <key>com.apple.security.network.client</key>
 <true/>
+<key>com.apple.security.files.user-selected.read-only</key>
+<true/>
 ```
+
+文件输入通过 `WKUIDelegate.runOpenPanel` 弹出 `NSOpenPanel`。沙盒应用需要 user-selected files 权限。
 
 macOS 与 iOS 共用 `xue_hua_webview_wkwebview`，但部分 UIKit 风格的属性在 macOS 上没有实现。详见[iOS 和 macOS](/xue_hua_webview/zh/platforms/ios-macos/)。
 

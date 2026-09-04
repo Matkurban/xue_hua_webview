@@ -22,8 +22,9 @@ class WindowsWebViewStorageManagerCreationParams
 /// Clears WebView2 cookies, cache, and DOM storage without a visible widget.
 class WindowsWebViewStorageManager extends PlatformWebViewStorageManager {
   /// Constructs a [WindowsWebViewStorageManager].
-  WindowsWebViewStorageManager(PlatformWebViewStorageManagerCreationParams params)
-    : super.implementation(
+  WindowsWebViewStorageManager(
+    PlatformWebViewStorageManagerCreationParams params,
+  ) : super.implementation(
         params is WindowsWebViewStorageManagerCreationParams
             ? params
             : const WindowsWebViewStorageManagerCreationParams(),

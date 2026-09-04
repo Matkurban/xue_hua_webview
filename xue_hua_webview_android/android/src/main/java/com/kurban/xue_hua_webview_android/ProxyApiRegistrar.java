@@ -19,6 +19,8 @@ public class ProxyApiRegistrar extends AndroidWebkitLibraryPigeonProxyApiRegistr
 
   @NonNull private final FlutterAssetManager flutterAssetManager;
 
+  @NonNull private final FileChooserHelper fileChooserHelper = new FileChooserHelper();
+
   public ProxyApiRegistrar(
       @NonNull BinaryMessenger binaryMessenger,
       @NonNull Context context,
@@ -243,6 +245,16 @@ public class ProxyApiRegistrar extends AndroidWebkitLibraryPigeonProxyApiRegistr
 
   public void setContext(@NonNull Context context) {
     this.context = context;
+    if (context instanceof Activity) {
+      fileChooserHelper.setActivity((Activity) context);
+    } else {
+      fileChooserHelper.setActivity(null);
+    }
+  }
+
+  @NonNull
+  public FileChooserHelper getFileChooserHelper() {
+    return fileChooserHelper;
   }
 
   @NonNull

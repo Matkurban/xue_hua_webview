@@ -55,3 +55,4 @@ app.*.map.json
 **/flutter/ephemeral/
 **/Flutter/ephemeral/
 **/.symlinks/
+pubspec.lock

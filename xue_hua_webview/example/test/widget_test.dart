@@ -1,10 +1,3 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xue_hua_webview_platform_interface/xue_hua_webview_platform_interface.dart';
@@ -16,12 +9,30 @@ void main() {
     WebViewPlatform.instance = _TestWebViewPlatform();
   });
 
-  testWidgets('Bilibili app renders', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const BilibiliApp());
+  testWidgets('home offers local HTML and Bilibili demos', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ExampleApp());
 
-    expect(find.text('Bilibili'), findsOneWidget);
-    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.text('选择测试'), findsOneWidget);
+    expect(find.text('本地 HTML（文件选择）'), findsOneWidget);
+    expect(find.text('哔哩哔哩'), findsOneWidget);
+  });
+
+  testWidgets('opens the Bilibili demo', (WidgetTester tester) async {
+    await tester.pumpWidget(const ExampleApp());
+    await tester.tap(find.text('哔哩哔哩'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, '哔哩哔哩'), findsOneWidget);
+  });
+
+  testWidgets('opens the local file-chooser demo', (WidgetTester tester) async {
+    await tester.pumpWidget(const ExampleApp());
+    await tester.tap(find.text('本地 HTML（文件选择）'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, '文件选择'), findsOneWidget);
   });
 }
 
@@ -55,12 +66,21 @@ class _TestWebViewController extends PlatformWebViewController {
   Future<void> loadRequest(LoadRequestParams params) async {}
 
   @override
+  Future<void> loadFlutterAsset(String key) async {}
+
+  @override
   Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {}
 
   @override
   Future<void> setPlatformNavigationDelegate(
     PlatformNavigationDelegate handler,
   ) async {}
+
+  @override
+  Future<bool> canGoBack() async => false;
+
+  @override
+  Future<bool> canGoForward() async => false;
 }
 
 class _TestNavigationDelegate extends PlatformNavigationDelegate {
