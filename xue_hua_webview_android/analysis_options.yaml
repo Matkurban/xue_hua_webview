@@ -6,3 +6,5 @@ analyzer:
     - lib/src/**/*.g.dart
     - test/*.mocks.dart
     - test/**/*.mocks.dart
+    - build/**
+    - android/**

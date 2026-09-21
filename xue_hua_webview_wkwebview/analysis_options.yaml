@@ -5,3 +5,4 @@ analyzer:
     - lib/src/**/*.g.dart
     - lib/src/common/*.g.dart
     - test/**/*.mocks.dart
+    - build/**

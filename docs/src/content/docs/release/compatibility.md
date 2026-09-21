@@ -7,7 +7,7 @@ description: Version alignment, dependency baseline, and maintenance rules.
 
 | Package | Version |
 | --- | --- |
-| `xue_hua_webview` | `1.1.0` |
+| `xue_hua_webview` | `1.1.1` |
 | `xue_hua_webview_windows` | `1.0.3` |
 | `xue_hua_webview_linux` | `1.0.2` |
 | `xue_hua_webview_web` | `1.0.2` |

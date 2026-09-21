@@ -37,6 +37,14 @@ Widget build(BuildContext context) {
 
 更详细的用法、接口覆盖和平台限制请参考[中文文档](https://matkurban.github.io/xue_hua_webview/zh)。
 
+## Agent skills
+
+本包在 `skills/` 下提供面向 AI 编码助手的 [package skills](https://dart.dev/tools/pub/package-skills)。在依赖 `xue_hua_webview` 的项目中执行：
+
+```sh
+dart run skills@ get
+```
+
 ## 文件选择与权限
 
 各端 `<input type="file">` 无需 Dart 回调即可使用。Android 使用内置 Photo

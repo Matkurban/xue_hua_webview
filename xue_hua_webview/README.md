@@ -38,6 +38,14 @@ Widget build(BuildContext context) {
 
 For detailed usage, API coverage, and platform limits, see the [Documentation](https://matkurban.github.io/xue_hua_webview).
 
+## Agent skills
+
+This package ships agent skills for Cursor, Claude Code, Gemini, Copilot, and other tools that support [package skills](https://dart.dev/tools/pub/package-skills). In a project that depends on `xue_hua_webview`, run:
+
+```sh
+dart run skills@ get
+```
+
 ## File inputs and permissions
 
 `<input type="file">` works without a Dart callback on every platform. Android

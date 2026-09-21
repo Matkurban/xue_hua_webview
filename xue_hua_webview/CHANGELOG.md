@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Ship AI agent skills with the package under `skills/`. After adding this package, consumers can install them with `dart run skills@ get`.
+
 ## 1.1.0
 
 - Add a built-in Android file chooser for `<input type="file">`. Image and video accept types use the system Photo Picker, other MIME types use `ACTION_GET_CONTENT`, multiple selection is supported, and `capture` opens the camera after a `CAMERA` permission grant. Cancel, permission denial, Dart override failure, and activity detach always complete `filePathCallback` with `null` so the input does not freeze.
