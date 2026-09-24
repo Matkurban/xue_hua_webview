@@ -44,18 +44,22 @@ The workflow:
 
 ## GitHub Pages
 
-The workflow file is `.github/workflows/docs.yml`. It runs on a push to `main`
-only when a file under `docs/` changes, or by manual dispatch.
+`.github/workflows/deploy-web.yml` publishes the site on every push to `main`,
+or by manual dispatch. `.github/workflows/docs.yml` only checks that the
+documentation still builds.
 
 Build flow:
 
 1. Checks out the repository.
-2. Installs pnpm 10.19.0.
-3. Installs Node 24 with pnpm caching enabled.
-4. Runs `pnpm install --frozen-lockfile` in `docs/`.
-5. Runs `pnpm build`.
-6. Uploads `docs/dist`.
-7. Deploys with GitHub Pages Actions.
+2. Installs pnpm 10.19.0 and Node 24, then builds `docs/`.
+3. Installs Flutter 3.47 and analyzes `xue_hua_webview/example`.
+4. Builds the web example with base href `/xue_hua_webview/demo/`.
+5. Copies that build into `docs/dist/demo`.
+6. Uploads `docs/dist` and deploys it with GitHub Pages Actions.
+
+The example is published beside the documentation so a demo deploy does not
+replace the docs site. One repository has one Pages site, so only
+`deploy-web.yml` uploads the artifact.
 
 ## Production URL
 
@@ -76,6 +80,12 @@ Simplified Chinese URL:
 
 ```text
 https://matkurban.github.io/xue_hua_webview/zh
+```
+
+Web example:
+
+```text
+https://matkurban.github.io/xue_hua_webview/demo/
 ```
 
 In GitHub repository settings, Pages source must be set to `GitHub Actions`.

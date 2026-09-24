@@ -1,0 +1,72 @@
+name: Deploy web demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+
+      - name: Build documentation
+        working-directory: docs
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+
+      - name: Analyze example
+        working-directory: xue_hua_webview/example
+        run: |
+          flutter pub get
+          flutter analyze --fatal-infos
+
+      - name: Build web example
+        working-directory: xue_hua_webview/example
+        run: flutter build web --release --base-href /xue_hua_webview/demo/
+
+      - name: Merge demo into site
+        run: |
+          mkdir -p docs/dist/demo
+          cp -R xue_hua_webview/example/build/web/. docs/dist/demo/
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

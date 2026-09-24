@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:abutil/abutil.dart';
+import 'package:example/app_theme.dart';
+import 'package:flutter/foundation.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:xue_hua_webview/xue_hua_webview.dart';
 
 enum ExampleDemo { fileChooser, bilibili }
@@ -15,9 +16,10 @@ class ExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'xue_hua_webview',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       home: const ExampleHomePage(),
     );
   }
@@ -141,7 +143,7 @@ class _ExampleWebViewPageState extends State<ExampleWebViewPage> {
   }
 
   Future<void> _configureAndLoad() async {
-    if (!isWeb()) {
+    if (!kIsWeb) {
       await _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
       await _controller.setNavigationDelegate(
         NavigationDelegate(
@@ -246,7 +248,7 @@ class _ExampleWebViewPageState extends State<ExampleWebViewPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
-        actions: isWeb()
+        actions: kIsWeb
             ? const <Widget>[]
             : <Widget>[
                 IconButton(
@@ -296,7 +298,7 @@ class _ExampleWebViewPageState extends State<ExampleWebViewPage> {
               ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
-          child: !isWeb() && _progress < 100
+          child: !kIsWeb && _progress < 100
               ? LinearProgressIndicator(value: _progress / 100)
               : const SizedBox(height: 3),
         ),

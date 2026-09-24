@@ -41,18 +41,20 @@ workflow 会：
 
 ## GitHub Pages
 
-workflow 文件是 `.github/workflows/docs.yml`。只有 `docs/` 下文件发生变化并
-push 到 `main` 时才会自动运行，也可以手动触发。
+`.github/workflows/deploy-web.yml` 在每次 push 到 `main` 时发布站点，也可以手动触发。
+`.github/workflows/docs.yml` 只检查文档能否构建。
 
 构建流程：
 
 1. checkout 代码。
-2. 安装 pnpm 10.19.0。
-3. 安装 Node 24，并启用 pnpm cache。
-4. 在 `docs/` 执行 `pnpm install --frozen-lockfile`。
-5. 执行 `pnpm build`。
-6. 上传 `docs/dist`。
-7. 使用 GitHub Pages Actions 部署。
+2. 安装 pnpm 10.19.0 与 Node 24，然后构建 `docs/`。
+3. 安装 Flutter 3.47，并分析 `xue_hua_webview/example`。
+4. 以 base href `/xue_hua_webview/demo/` 构建 Web 示例。
+5. 把构建结果复制到 `docs/dist/demo`。
+6. 上传 `docs/dist`，并用 GitHub Pages Actions 部署。
+
+示例和文档放在同一站点里，避免示例部署覆盖文档。一个仓库只有一个 Pages
+站点，因此只有 `deploy-web.yml` 上传产物。
 
 ## 线上地址
 
@@ -73,6 +75,12 @@ https://matkurban.github.io/xue_hua_webview
 
 ```text
 https://matkurban.github.io/xue_hua_webview/zh
+```
+
+Web 示例：
+
+```text
+https://matkurban.github.io/xue_hua_webview/demo/
 ```
 
 GitHub 仓库设置中 Pages source 需要选择 `GitHub Actions`。

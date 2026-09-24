@@ -2,6 +2,8 @@
 
 [Documentation](https://matkurban.github.io/xue_hua_webview) | [中文文档](https://matkurban.github.io/xue_hua_webview/zh)
 
+Live demo: https://matkurban.github.io/xue_hua_webview/demo/
+
 A WebView component for all Flutter platforms, compatible with the
 [webview_flutter](https://pub.dev/packages/webview_flutter) API.
 

@@ -2,6 +2,8 @@
 
 [Documentation](https://matkurban.github.io/xue_hua_webview) | [中文文档](https://matkurban.github.io/xue_hua_webview/zh)
 
+在线示例：https://matkurban.github.io/xue_hua_webview/demo/
+
 支持所有 Flutter 平台的 WebView 组件，兼容[webview_flutter](https://pub.dev/packages/webview_flutter)接口。
 
 |     系统     | **支持情况** | **技术实现** |
